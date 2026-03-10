@@ -35,7 +35,12 @@ const STRINGS = {
     adminSourceGroupPlaceholder: '— Select group —',
     loadGroupVehiclesBtn: 'Load Vehicles',
     removeVehiclesBtn: 'Remove Selected',
-    loadingText: 'Loading fleet data…',
+    loadingText: 'Loading Fleet Data',
+    stepGroups: 'Groups',
+    stepDevices: 'Devices',
+    stepUsers: 'Users',
+    stepStatuses: 'Vehicle Status',
+    stepLicenses: 'Licenses',
     statusMoving: 'Moving',
     statusStopped: 'Stopped',
     statusIdling: 'Idling',
@@ -82,7 +87,12 @@ const STRINGS = {
     adminSourceGroupPlaceholder: '— Seleccione grupo —',
     loadGroupVehiclesBtn: 'Cargar Vehículos',
     removeVehiclesBtn: 'Quitar Seleccionados',
-    loadingText: 'Cargando datos de flota…',
+    loadingText: 'Cargando Datos de Flota',
+    stepGroups: 'Grupos',
+    stepDevices: 'Vehículos',
+    stepUsers: 'Usuarios',
+    stepStatuses: 'Estado de Vehículos',
+    stepLicenses: 'Licencias',
     statusMoving: 'En Marcha',
     statusStopped: 'Detenido',
     statusIdling: 'Ralentí',
@@ -196,13 +206,59 @@ function setOpStatus(el, msg, isError = false) {
   el.className = 'op-status ' + (isError ? 'error' : 'success');
 }
 
+const LOAD_STEPS = ['groups', 'devices', 'users', 'statuses', 'licenses'];
+
+function stepKey(id) {
+  return 'step' + id.charAt(0).toUpperCase() + id.slice(1);
+}
+
+function initLoadingSteps() {
+  const stepsEl = document.getElementById('loadingSteps');
+  if (!stepsEl) return;
+  stepsEl.innerHTML = LOAD_STEPS.map((id) =>
+    `<div class="loading-step loading-step--pending" id="lstep-${id}">` +
+    `<span class="step-icon"></span>` +
+    `<span class="step-label">${t(stepKey(id))}</span>` +
+    `<span class="step-count"></span>` +
+    `</div>`
+  ).join('');
+}
+
+function markStepLoading(id) {
+  const el = document.getElementById('lstep-' + id);
+  if (!el) return;
+  el.className = 'loading-step loading-step--active';
+  el.querySelector('.step-label').textContent = t(stepKey(id));
+}
+
+function markStepDone(id, count) {
+  const el = document.getElementById('lstep-' + id);
+  if (!el) return;
+  el.className = 'loading-step loading-step--done';
+  const countEl = el.querySelector('.step-count');
+  if (countEl) countEl.textContent = count !== undefined ? count.toLocaleString() : '';
+}
+
+function markStepError(id) {
+  const el = document.getElementById('lstep-' + id);
+  if (el) el.className = 'loading-step loading-step--error';
+}
+
 function showLoading() {
   loadingText.textContent = t('loadingText');
+  initLoadingSteps();
   loadingOverlay.removeAttribute('hidden');
 }
 
 function hideLoading() {
   loadingOverlay.setAttribute('hidden', '');
+}
+
+/** Wraps api.call in a Promise */
+function apiCall(method, params) {
+  return new Promise((resolve, reject) => {
+    state.api.call(method, params, resolve, reject);
+  });
 }
 
 // =============================================================
@@ -496,53 +552,72 @@ function renderLicenseBar() {
 // 8. Data Loading
 // =============================================================
 
-function loadAllData() {
+async function loadAllData() {
   if (!state.api) return;
   showLoading();
   setStatus(t('statusLoading'));
 
-  state.api.multiCall(
-    [
-      ['Get', { typeName: 'Group' }],
-      ['Get', { typeName: 'Device', resultsLimit: 50000 }],
-      ['Get', { typeName: 'User',   resultsLimit: 10000 }],
-      ['Get', { typeName: 'DeviceStatusInfo', resultsLimit: 50000 }],
-      ['Get', { typeName: 'License' }],
-    ],
-    function(results) {
-      hideLoading();
-      try {
-        state.groups        = results[0] || [];
-        state.devices       = results[1] || [];
-        state.users         = results[2] || [];
-        state.deviceStatuses = results[3] || [];
-        const licenseRaw    = results[4];
+  try {
+    // Step 1: Groups — fast, renders the tree shell immediately
+    markStepLoading('groups');
+    const groups = await apiCall('Get', { typeName: 'Group' });
+    state.groups = groups || [];
+    markStepDone('groups', state.groups.length);
+    state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
+    renderTreeChart();
+    renderKpis();
 
-        state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
-        state.licenses  = parseLicenses(licenseRaw, state.devices);
+    // Step 2: Devices — largest dataset, re-renders tree with vehicle counts
+    markStepLoading('devices');
+    const devices = await apiCall('Get', { typeName: 'Device', resultsLimit: 50000 });
+    state.devices = devices || [];
+    markStepDone('devices', state.devices.length);
+    state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
+    renderTreeChart();
+    renderKpis();
 
-        renderKpis();
-        renderTreeChart();
-        renderDonutChart();
-        renderLicenseBar();
+    // Step 3: Users — adds user counts to the tree
+    markStepLoading('users');
+    const users = await apiCall('Get', { typeName: 'User', resultsLimit: 10000 });
+    state.users = users || [];
+    markStepDone('users', state.users.length);
+    state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
+    renderTreeChart();
+    renderKpis();
 
-        // Show admin panel for system admins
-        if (state.user && state.user.isSystemAdminUser) {
-          adminPanel.removeAttribute('hidden');
-          populateAdminSelects();
-          renderVehicleChecklist(vehicleChecklist, state.devices, state.adminSelectedVehicles);
-        }
+    // Step 4: Device status — powers the donut chart
+    markStepLoading('statuses');
+    const statuses = await apiCall('Get', { typeName: 'DeviceStatusInfo', resultsLimit: 50000 });
+    state.deviceStatuses = statuses || [];
+    markStepDone('statuses', state.deviceStatuses.length);
+    renderDonutChart();
 
-        setStatus(t('statusReady'));
-      } catch (err) {
-        setStatus(t('statusError') + ': ' + err.message, true);
-      }
-    },
-    function(err) {
-      hideLoading();
-      setStatus(t('statusError') + ': ' + (err && err.message ? err.message : String(err)), true);
+    // Step 5: Licenses — completes the license bar
+    markStepLoading('licenses');
+    let licenseRaw = null;
+    try {
+      licenseRaw = await apiCall('Get', { typeName: 'License' });
+    } catch (_licErr) {
+      // License API may not be available on all tenants — non-fatal
     }
-  );
+    state.licenses = parseLicenses(licenseRaw, state.devices);
+    markStepDone('licenses', state.licenses.used);
+    renderLicenseBar();
+    renderKpis();
+
+    // Admin panel — only for system admins
+    if (state.user && state.user.isSystemAdminUser) {
+      adminPanel.removeAttribute('hidden');
+      populateAdminSelects();
+      renderVehicleChecklist(vehicleChecklist, state.devices, state.adminSelectedVehicles);
+    }
+
+    setStatus(t('statusReady'));
+  } catch (err) {
+    setStatus(t('statusError') + ': ' + (err && err.message ? err.message : String(err)), true);
+  } finally {
+    hideLoading();
+  }
 }
 
 // =============================================================

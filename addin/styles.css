@@ -415,8 +415,78 @@ body {
 }
 
 #loadingText {
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fo-text);
+}
+
+/* ---------- Loading Steps ---------- */
+.loading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  min-width: 240px;
+}
+
+.loading-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
   color: var(--fo-muted);
+  padding: 3px 0;
+}
+
+.loading-step--active {
+  color: var(--fo-accent);
+  font-weight: 500;
+}
+
+.loading-step--done {
+  color: var(--fo-success-fg);
+}
+
+.loading-step--error {
+  color: var(--fo-danger);
+}
+
+.step-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.loading-step--pending .step-icon::before  { content: '○'; }
+.loading-step--done    .step-icon::before  { content: '✓'; font-weight: 700; }
+.loading-step--error   .step-icon::before  { content: '✗'; font-weight: 700; }
+
+/* Inline spinner for active step */
+.loading-step--active .step-icon::before {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: fo-spin 0.7s linear infinite;
+}
+
+.step-label {
+  flex: 1;
+}
+
+.step-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: inherit;
+  min-width: 48px;
+  text-align: right;
 }
 
 /* ---------- Responsive: ≤1024px → single column ---------- */

@@ -12,12 +12,8 @@ const STRINGS = {
     kpiVehicles: 'Vehicles',
     kpiGroups: 'Groups',
     kpiUsers: 'Users',
-    kpiLicenses: 'Active Devices',
     treePanelTitle: 'Group Hierarchy',
     donutPanelTitle: 'Vehicle Status',
-    licensePanelTitle: 'Device Plans',
-    licenseUsed: 'Active:',
-    licenseAvail: 'Inactive:',
     adminPanelTitle: 'Admin Tools',
     adminCreateTitle: 'Create Group',
     adminGroupNameLabel: 'Group Name',
@@ -40,7 +36,6 @@ const STRINGS = {
     stepDevices: 'Devices',
     stepUsers: 'Users',
     stepStatuses: 'Vehicle Status',
-    stepLicenses: 'Device Plans',
     statusMoving: 'Moving',
     statusStopped: 'Stopped',
     statusIdling: 'Idling',
@@ -64,12 +59,8 @@ const STRINGS = {
     kpiVehicles: 'Vehículos',
     kpiGroups: 'Grupos',
     kpiUsers: 'Usuarios',
-    kpiLicenses: 'Vehículos Activos',
     treePanelTitle: 'Jerarquía de Grupos',
     donutPanelTitle: 'Estado de Vehículos',
-    licensePanelTitle: 'Planes por Vehículo',
-    licenseUsed: 'Activos:',
-    licenseAvail: 'Inactivos:',
     adminPanelTitle: 'Herramientas Admin',
     adminCreateTitle: 'Crear Grupo',
     adminGroupNameLabel: 'Nombre del Grupo',
@@ -92,7 +83,6 @@ const STRINGS = {
     stepDevices: 'Vehículos',
     stepUsers: 'Usuarios',
     stepStatuses: 'Estado de Vehículos',
-    stepLicenses: 'Planes de Vehículo',
     statusMoving: 'En Marcha',
     statusStopped: 'Detenido',
     statusIdling: 'Ralentí',
@@ -123,21 +113,10 @@ const kpiGroupsVal        = document.getElementById('kpiGroupsVal');
 const kpiGroupsLabel      = document.getElementById('kpiGroupsLabel');
 const kpiUsersVal         = document.getElementById('kpiUsersVal');
 const kpiUsersLabel       = document.getElementById('kpiUsersLabel');
-const kpiLicensesVal      = document.getElementById('kpiLicensesVal');
-const kpiLicensesLabel    = document.getElementById('kpiLicensesLabel');
-
 const treePanelTitle      = document.getElementById('treePanelTitle');
 const treeChartEl         = document.getElementById('treeChart');
 const donutPanelTitle     = document.getElementById('donutPanelTitle');
 const donutChartEl        = document.getElementById('donutChart');
-
-const licensePanelTitle   = document.getElementById('licensePanelTitle');
-const licenseBarEl        = document.getElementById('licenseBar');
-const licenseUsedLabel    = document.getElementById('licenseUsedLabel');
-const licenseUsedVal      = document.getElementById('licenseUsedVal');
-const licenseAvailLabel   = document.getElementById('licenseAvailLabel');
-const licenseAvailVal     = document.getElementById('licenseAvailVal');
-const licensePctVal       = document.getElementById('licensePctVal');
 
 const adminPanel          = document.getElementById('adminPanel');
 const adminPanelTitle     = document.getElementById('adminPanelTitle');
@@ -179,7 +158,6 @@ const state = {
   devices: [],
   users: [],
   deviceStatuses: [],
-  devicePlans: null,
   groupTree: null,
   lang: 'en',
   adminSelectedVehicles: new Set(),
@@ -327,65 +305,11 @@ function buildGroupTree(groups, devices, users) {
   return syntheticRoot;
 }
 
-// Plan keys that represent inactive/non-billable devices
-const PLAN_INACTIVE = new Set(['Suspend', 'Terminate']);
-
-// Geotab DevicePlan enum → human-readable label
-const PLAN_DISPLAY = {
-  'ProPlus':      'Pro Plus',
-  'Pro':          'Pro',
-  'Base':         'Go Plan',
-  'Intermediate': 'Intermediate',
-  'RateBasePlan': 'Rate Base',
-  'GoTalk':       'GoTalk',
-  'Suspend':      'Suspended',
-  'Terminate':    'Terminated',
-};
-
-// Colour per plan (active plans = teal/green family, inactive = amber/red)
-const PLAN_COLORS = {
-  'ProPlus':      '#0f766e',
-  'Pro':          '#0d9488',
-  'Base':         '#22c55e',
-  'Intermediate': '#4ade80',
-  'RateBasePlan': '#64748b',
-  'GoTalk':       '#6ee7b7',
-  'Suspend':      '#f59e0b',
-  'Terminate':    '#b91c1c',
-};
-
-/**
- * Aggregate DevicePlanBillingInfo records into plan counts.
- * Returns { plans: [{key, label, count, active}], total, active }
- */
-function parseDevicePlans(planBillingInfo) {
-  const counts = {};
-  for (const info of (planBillingInfo || [])) {
-    const key = info.devicePlan || 'Unknown';
-    counts[key] = (counts[key] || 0) + 1;
-  }
-
-  const plans = Object.entries(counts)
-    .map(([key, count]) => ({
-      key,
-      label:  PLAN_DISPLAY[key] || key,
-      count,
-      active: !PLAN_INACTIVE.has(key),
-    }))
-    .sort((a, b) => b.count - a.count);
-
-  const total  = plans.reduce((s, p) => s + p.count, 0);
-  const active = plans.filter((p) => p.active).reduce((s, p) => s + p.count, 0);
-
-  return { plans, total, active };
-}
-
 // =============================================================
 // 6. Chart instances
 // =============================================================
-let treeChartInstance    = null;
-let donutChartInstance   = null;
-let licenseBarInstance   = null;
+let treeChartInstance  = null;
+let donutChartInstance = null;
 
 // =============================================================
 // 7. Render Functions
@@ -396,8 +320,6 @@ function renderKpis() {
   kpiGroupsVal.textContent   = state.groups.length.toLocaleString();
   kpiUsersVal.textContent    = state.users.length.toLocaleString();
 
-  const dp = state.devicePlans;
-  kpiLicensesVal.textContent = dp ? dp.active.toLocaleString() : '—';
 }
 
 function toEChartsNodes(nodes) {
@@ -523,62 +445,6 @@ function renderDonutChart() {
   }, true);
 }
 
-function renderPlansChart() {
-  if (!licenseBarInstance) {
-    licenseBarInstance = echarts.init(licenseBarEl);
-  }
-
-  const dp = state.devicePlans;
-  if (!dp || !dp.plans.length) {
-    licenseBarInstance.setOption({ series: [] }, true);
-    licenseUsedVal.textContent  = '—';
-    licenseAvailVal.textContent = '—';
-    licensePctVal.textContent   = '—';
-    return;
-  }
-
-  // Grow chart container to fit all plan rows before initialising
-  const rowH = 28;
-  licenseBarEl.style.height = (dp.plans.length * rowH + 20) + 'px';
-  licenseBarInstance.resize();
-
-  const inactive = dp.total - dp.active;
-  licenseUsedVal.textContent  = dp.active.toLocaleString();
-  licenseAvailVal.textContent = inactive.toLocaleString();
-  licensePctVal.textContent   = dp.total
-    ? `${Math.round((dp.active / dp.total) * 100)}%`
-    : '—';
-
-  licenseBarInstance.setOption({
-    grid: { top: 4, bottom: 4, left: 110, right: 44, containLabel: false },
-    xAxis: { type: 'value', show: false },
-    yAxis: {
-      type: 'category',
-      data: dp.plans.map((p) => p.label),
-      axisLabel: { fontSize: 12, color: '#475569' },
-      axisTick: { show: false },
-      axisLine: { show: false },
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-      formatter: (params) => `${params[0].name}: <strong>${params[0].value}</strong>`,
-    },
-    series: [{
-      type: 'bar',
-      barMaxWidth: 20,
-      showBackground: true,
-      backgroundStyle: { color: '#f1f5f9', borderRadius: 4 },
-      itemStyle: { borderRadius: 4 },
-      label: { show: true, position: 'right', fontSize: 12, color: '#475569', formatter: '{c}' },
-      data: dp.plans.map((p) => ({
-        value: p.count,
-        itemStyle: { color: PLAN_COLORS[p.key] || '#94a3b8' },
-      })),
-    }],
-  }, true);
-}
-
 // =============================================================
 // 8. Data Loading
 // =============================================================
@@ -622,8 +488,6 @@ async function loadAllData() {
     state.deviceStatuses = statuses || [];
     markStepDone('statuses', state.deviceStatuses.length);
     renderDonutChart();
-
-    // Step 5 (DevicePlanBillingInfo) disabled — re-enable when API access confirmed
 
     // Admin panel — only for system admins
     if (state.user && state.user.isSystemAdminUser) {
@@ -857,12 +721,8 @@ const TEXT_MAP = {
   kpiVehiclesLabel:     'kpiVehicles',
   kpiGroupsLabel:       'kpiGroups',
   kpiUsersLabel:        'kpiUsers',
-  kpiLicensesLabel:     'kpiLicenses',
   treePanelTitle:       'treePanelTitle',
   donutPanelTitle:      'donutPanelTitle',
-  licensePanelTitle:    'licensePanelTitle',
-  licenseUsedLabel:     'licenseUsed',
-  licenseAvailLabel:    'licenseAvail',
   adminCreateTitle:     'adminCreateTitle',
   adminGroupNameLabel:  'adminGroupNameLabel',
   adminParentLabel:     'adminParentLabel',
@@ -926,7 +786,6 @@ function applyLang(lang) {
   // Re-render charts so labels update
   if (state.groupTree) renderTreeChart();
   if (state.deviceStatuses.length) renderDonutChart();
-  if (state.devicePlans) renderPlansChart();
 }
 
 // =============================================================
@@ -973,7 +832,6 @@ removeVehiclesBtn.addEventListener('click', removeVehicles);
 window.addEventListener('resize', () => {
   if (treeChartInstance)  treeChartInstance.resize();
   if (donutChartInstance) donutChartInstance.resize();
-  if (licenseBarInstance) licenseBarInstance.resize();
 });
 
 // =============================================================
@@ -997,12 +855,9 @@ geotab.addin.FleetOrg = function () {
 
   function blur() {
     // Dispose all chart instances to prevent memory leaks
-    [treeChartInstance, donutChartInstance, licenseBarInstance].forEach((c) => {
-      if (c) c.dispose();
-    });
+    [treeChartInstance, donutChartInstance].forEach((c) => { if (c) c.dispose(); });
     treeChartInstance  = null;
     donutChartInstance = null;
-    licenseBarInstance = null;
   }
 
   return { initialize, focus, blur };

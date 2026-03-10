@@ -163,7 +163,7 @@ body {
 /* ---------- KPI Row ---------- */
 .fo-kpi-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--fo-gap-md);
 }
 
@@ -224,49 +224,7 @@ body {
   width: 100%;
 }
 
-.chart-container--short {
-  height: 80px;
-  width: 100%;
-}
 
-.chart-container--plans {
-  /* JS sets exact height based on plan count; 80px is the minimum */
-  min-height: 80px;
-  width: 100%;
-}
-
-/* ---------- License Panel ---------- */
-.fo-panel--license {
-  /* stacks with other panels */
-}
-
-.license-body {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--fo-gap-md);
-  align-items: center;
-}
-
-.license-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.license-stat-row {
-  display: flex;
-  gap: var(--fo-gap-sm);
-  font-size: 13px;
-}
-
-.license-stat-row span:first-child {
-  color: var(--fo-muted);
-  min-width: 80px;
-}
-
-.license-stat-row strong {
-  color: var(--fo-text);
-}
 
 /* ---------- Admin Panel ---------- */
 #adminPanel {

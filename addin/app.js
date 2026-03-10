@@ -12,12 +12,12 @@ const STRINGS = {
     kpiVehicles: 'Vehicles',
     kpiGroups: 'Groups',
     kpiUsers: 'Users',
-    kpiLicenses: 'Licenses Used',
+    kpiLicenses: 'Active Devices',
     treePanelTitle: 'Group Hierarchy',
     donutPanelTitle: 'Vehicle Status',
-    licensePanelTitle: 'License Utilization',
-    licenseUsed: 'Used:',
-    licenseAvail: 'Available:',
+    licensePanelTitle: 'Device Plans',
+    licenseUsed: 'Active:',
+    licenseAvail: 'Inactive:',
     adminPanelTitle: 'Admin Tools',
     adminCreateTitle: 'Create Group',
     adminGroupNameLabel: 'Group Name',
@@ -40,7 +40,7 @@ const STRINGS = {
     stepDevices: 'Devices',
     stepUsers: 'Users',
     stepStatuses: 'Vehicle Status',
-    stepLicenses: 'Licenses',
+    stepLicenses: 'Device Plans',
     statusMoving: 'Moving',
     statusStopped: 'Stopped',
     statusIdling: 'Idling',
@@ -64,12 +64,12 @@ const STRINGS = {
     kpiVehicles: 'Vehículos',
     kpiGroups: 'Grupos',
     kpiUsers: 'Usuarios',
-    kpiLicenses: 'Licencias Usadas',
+    kpiLicenses: 'Vehículos Activos',
     treePanelTitle: 'Jerarquía de Grupos',
     donutPanelTitle: 'Estado de Vehículos',
-    licensePanelTitle: 'Uso de Licencias',
-    licenseUsed: 'Usadas:',
-    licenseAvail: 'Disponibles:',
+    licensePanelTitle: 'Planes por Vehículo',
+    licenseUsed: 'Activos:',
+    licenseAvail: 'Inactivos:',
     adminPanelTitle: 'Herramientas Admin',
     adminCreateTitle: 'Crear Grupo',
     adminGroupNameLabel: 'Nombre del Grupo',
@@ -92,7 +92,7 @@ const STRINGS = {
     stepDevices: 'Vehículos',
     stepUsers: 'Usuarios',
     stepStatuses: 'Estado de Vehículos',
-    stepLicenses: 'Licencias',
+    stepLicenses: 'Planes de Vehículo',
     statusMoving: 'En Marcha',
     statusStopped: 'Detenido',
     statusIdling: 'Ralentí',
@@ -179,7 +179,7 @@ const state = {
   devices: [],
   users: [],
   deviceStatuses: [],
-  licenses: null,
+  devicePlans: null,
   groupTree: null,
   lang: 'en',
   adminSelectedVehicles: new Set(),
@@ -327,25 +327,57 @@ function buildGroupTree(groups, devices, users) {
   return syntheticRoot;
 }
 
+// Plan keys that represent inactive/non-billable devices
+const PLAN_INACTIVE = new Set(['Suspend', 'Terminate']);
+
+// Geotab DevicePlan enum → human-readable label
+const PLAN_DISPLAY = {
+  'ProPlus':      'Pro Plus',
+  'Pro':          'Pro',
+  'Base':         'Go Plan',
+  'Intermediate': 'Intermediate',
+  'RateBasePlan': 'Rate Base',
+  'GoTalk':       'GoTalk',
+  'Suspend':      'Suspended',
+  'Terminate':    'Terminated',
+};
+
+// Colour per plan (active plans = teal/green family, inactive = amber/red)
+const PLAN_COLORS = {
+  'ProPlus':      '#0f766e',
+  'Pro':          '#0d9488',
+  'Base':         '#22c55e',
+  'Intermediate': '#4ade80',
+  'RateBasePlan': '#64748b',
+  'GoTalk':       '#6ee7b7',
+  'Suspend':      '#f59e0b',
+  'Terminate':    '#b91c1c',
+};
+
 /**
- * Parse license data. Falls back to counting active devices if API returns null.
+ * Aggregate DevicePlanBillingInfo records into plan counts.
+ * Returns { plans: [{key, label, count, active}], total, active }
  */
-function parseLicenses(licenseResult, devices) {
-  if (licenseResult && Array.isArray(licenseResult) && licenseResult.length > 0) {
-    let total = 0;
-    let used  = 0;
-    for (const lic of licenseResult) {
-      total += (lic.maxDeviceCount || lic.deviceCount || 0);
-      used  += (lic.activeDeviceCount || lic.usedDeviceCount || 0);
-    }
-    // If parsing produced zeroes, fall back
-    if (total > 0) {
-      return { used, total, available: Math.max(0, total - used) };
-    }
+function parseDevicePlans(planBillingInfo) {
+  const counts = {};
+  for (const info of (planBillingInfo || [])) {
+    const key = info.devicePlan || 'Unknown';
+    counts[key] = (counts[key] || 0) + 1;
   }
-  // Fallback: count active devices as "used", no total known
-  const used = devices.filter((d) => d.deviceType !== 'None').length;
-  return { used, total: null, available: null };
+
+  const plans = Object.entries(counts)
+    .map(([key, count]) => ({
+      key,
+      label:  PLAN_DISPLAY[key] || key,
+      count,
+      active: !PLAN_INACTIVE.has(key),
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const total  = plans.reduce((s, p) => s + p.count, 0);
+  const active = plans.filter((p) => p.active).reduce((s, p) => s + p.count, 0);
+
+  return { plans, total, active };
 }
 
 // =============================================================
@@ -364,12 +396,8 @@ function renderKpis() {
   kpiGroupsVal.textContent   = state.groups.length.toLocaleString();
   kpiUsersVal.textContent    = state.users.length.toLocaleString();
 
-  const lic = state.licenses;
-  if (lic) {
-    kpiLicensesVal.textContent = lic.used.toLocaleString();
-  } else {
-    kpiLicensesVal.textContent = '—';
-  }
+  const dp = state.devicePlans;
+  kpiLicensesVal.textContent = dp ? dp.active.toLocaleString() : '—';
 }
 
 function toEChartsNodes(nodes) {
@@ -495,13 +523,13 @@ function renderDonutChart() {
   }, true);
 }
 
-function renderLicenseBar() {
+function renderPlansChart() {
   if (!licenseBarInstance) {
     licenseBarInstance = echarts.init(licenseBarEl);
   }
 
-  const lic = state.licenses;
-  if (!lic) {
+  const dp = state.devicePlans;
+  if (!dp || !dp.plans.length) {
     licenseBarInstance.setOption({ series: [] }, true);
     licenseUsedVal.textContent  = '—';
     licenseAvailVal.textContent = '—';
@@ -509,41 +537,44 @@ function renderLicenseBar() {
     return;
   }
 
-  const used  = lic.used;
-  const total = lic.total;
+  // Grow chart container to fit all plan rows before initialising
+  const rowH = 28;
+  licenseBarEl.style.height = (dp.plans.length * rowH + 20) + 'px';
+  licenseBarInstance.resize();
 
-  let pct = 0;
-  let barColor = '#22c55e';
-
-  if (total && total > 0) {
-    pct = Math.round((used / total) * 100);
-    if (pct >= 90)      barColor = '#b91c1c';
-    else if (pct >= 70) barColor = '#f59e0b';
-    else                barColor = '#22c55e';
-  }
-
-  licenseUsedVal.textContent  = used.toLocaleString();
-  licenseAvailVal.textContent = lic.available !== null ? lic.available.toLocaleString() : '—';
-  licensePctVal.textContent   = total ? `${pct}%` : `${used} active`;
-
-  if (!total) {
-    // No total known — show a simple informational bar
-    licenseBarInstance.setOption({ series: [] }, true);
-    return;
-  }
+  const inactive = dp.total - dp.active;
+  licenseUsedVal.textContent  = dp.active.toLocaleString();
+  licenseAvailVal.textContent = inactive.toLocaleString();
+  licensePctVal.textContent   = dp.total
+    ? `${Math.round((dp.active / dp.total) * 100)}%`
+    : '—';
 
   licenseBarInstance.setOption({
-    grid: { top: 4, bottom: 4, left: 4, right: 4, containLabel: false },
-    xAxis: { type: 'value', max: total, show: false },
-    yAxis: { type: 'category', data: [''], show: false },
+    grid: { top: 4, bottom: 4, left: 110, right: 44, containLabel: false },
+    xAxis: { type: 'value', show: false },
+    yAxis: {
+      type: 'category',
+      data: dp.plans.map((p) => p.label),
+      axisLabel: { fontSize: 12, color: '#475569' },
+      axisTick: { show: false },
+      axisLine: { show: false },
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params) => `${params[0].name}: <strong>${params[0].value}</strong>`,
+    },
     series: [{
       type: 'bar',
-      data: [used],
-      barMaxWidth: '100%',
+      barMaxWidth: 20,
       showBackground: true,
-      backgroundStyle: { color: '#e2e8f0' },
-      itemStyle: { color: barColor, borderRadius: [4, 4, 4, 4] },
-      label: { show: true, position: 'insideRight', formatter: `${pct}%`, color: '#fff', fontWeight: 'bold' },
+      backgroundStyle: { color: '#f1f5f9', borderRadius: 4 },
+      itemStyle: { borderRadius: 4 },
+      label: { show: true, position: 'right', fontSize: 12, color: '#475569', formatter: '{c}' },
+      data: dp.plans.map((p) => ({
+        value: p.count,
+        itemStyle: { color: PLAN_COLORS[p.key] || '#94a3b8' },
+      })),
     }],
   }, true);
 }
@@ -592,17 +623,12 @@ async function loadAllData() {
     markStepDone('statuses', state.deviceStatuses.length);
     renderDonutChart();
 
-    // Step 5: Licenses — completes the license bar
+    // Step 5: Device plan info — one record per device, drives the plans chart
     markStepLoading('licenses');
-    let licenseRaw = null;
-    try {
-      licenseRaw = await apiCall('Get', { typeName: 'License' });
-    } catch (_licErr) {
-      // License API may not be available on all tenants — non-fatal
-    }
-    state.licenses = parseLicenses(licenseRaw, state.devices);
-    markStepDone('licenses', state.licenses.used);
-    renderLicenseBar();
+    const planBillingInfo = await apiCall('Get', { typeName: 'DevicePlanBillingInfo', resultsLimit: 50000 });
+    state.devicePlans = parseDevicePlans(planBillingInfo);
+    markStepDone('licenses', state.devicePlans.total);
+    renderPlansChart();
     renderKpis();
 
     // Admin panel — only for system admins
@@ -906,7 +932,7 @@ function applyLang(lang) {
   // Re-render charts so labels update
   if (state.groupTree) renderTreeChart();
   if (state.deviceStatuses.length) renderDonutChart();
-  if (state.licenses !== undefined) renderLicenseBar();
+  if (state.devicePlans) renderPlansChart();
 }
 
 // =============================================================

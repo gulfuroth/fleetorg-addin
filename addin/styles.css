@@ -229,6 +229,12 @@ body {
   width: 100%;
 }
 
+.chart-container--plans {
+  /* JS sets exact height based on plan count; 80px is the minimum */
+  min-height: 80px;
+  width: 100%;
+}
+
 /* ---------- License Panel ---------- */
 .fo-panel--license {
   /* stacks with other panels */

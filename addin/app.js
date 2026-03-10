@@ -206,7 +206,7 @@ function setOpStatus(el, msg, isError = false) {
   el.className = 'op-status ' + (isError ? 'error' : 'success');
 }
 
-const LOAD_STEPS = ['groups', 'devices', 'users', 'statuses', 'licenses'];
+const LOAD_STEPS = ['groups', 'devices', 'users', 'statuses']; // 'licenses' disabled
 
 function stepKey(id) {
   return 'step' + id.charAt(0).toUpperCase() + id.slice(1);
@@ -623,13 +623,7 @@ async function loadAllData() {
     markStepDone('statuses', state.deviceStatuses.length);
     renderDonutChart();
 
-    // Step 5: Device plan info — one record per device, drives the plans chart
-    markStepLoading('licenses');
-    const planBillingInfo = await apiCall('Get', { typeName: 'DevicePlanBillingInfo', resultsLimit: 50000 });
-    state.devicePlans = parseDevicePlans(planBillingInfo);
-    markStepDone('licenses', state.devicePlans.total);
-    renderPlansChart();
-    renderKpis();
+    // Step 5 (DevicePlanBillingInfo) disabled — re-enable when API access confirmed
 
     // Admin panel — only for system admins
     if (state.user && state.user.isSystemAdminUser) {

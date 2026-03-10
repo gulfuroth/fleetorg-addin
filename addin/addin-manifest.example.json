@@ -1,0 +1,12 @@
+{
+  "name": "Fleet Org",
+  "addinId": "FleetOrg",
+  "version": "1.0.0",
+  "menuName": {
+    "en": "Fleet Org",
+    "es": "Org. de Flota"
+  },
+  "path": "https://YOUR_HOST/addin/index.html",
+  "supportEmail": "you@example.com",
+  "icon": "https://YOUR_HOST/addin/icon.svg"
+}

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fleet Org</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- ECharts 5 from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div class="fo-container">
+
+    <!-- ===== Header ===== -->
+    <header class="fo-header">
+      <h1 id="title">
+        <svg width="24" height="24" viewBox="0 0 128 128" aria-hidden="true">
+          <rect width="128" height="128" rx="16" fill="#0f766e"/>
+          <rect x="48" y="14" width="32" height="20" rx="4" fill="#fff" opacity="0.95"/>
+          <line x1="64" y1="34" x2="64" y2="48" stroke="#fff" stroke-width="3" opacity="0.8"/>
+          <line x1="26" y1="48" x2="102" y2="48" stroke="#fff" stroke-width="3" opacity="0.8"/>
+          <line x1="26" y1="48" x2="26" y2="58" stroke="#fff" stroke-width="3" opacity="0.8"/>
+          <line x1="64" y1="48" x2="64" y2="58" stroke="#fff" stroke-width="3" opacity="0.8"/>
+          <line x1="102" y1="48" x2="102" y2="58" stroke="#fff" stroke-width="3" opacity="0.8"/>
+          <rect x="10" y="58" width="32" height="20" rx="4" fill="#fff" opacity="0.95"/>
+          <rect x="48" y="58" width="32" height="20" rx="4" fill="#fff" opacity="0.95"/>
+          <rect x="86" y="58" width="32" height="20" rx="4" fill="#fff" opacity="0.95"/>
+        </svg>
+        Fleet Org
+      </h1>
+      <div class="fo-header-actions">
+        <span id="statusBadge">—</span>
+        <button id="langToggleBtn" class="fo-btn fo-btn--ghost fo-btn--sm" type="button">ES</button>
+      </div>
+    </header>
+
+    <!-- ===== KPI Row ===== -->
+    <section class="fo-kpi-row" aria-label="Key metrics">
+      <div class="fo-kpi-card">
+        <div class="fo-kpi-value" id="kpiVehiclesVal">—</div>
+        <div class="fo-kpi-label" id="kpiVehiclesLabel">Vehicles</div>
+      </div>
+      <div class="fo-kpi-card">
+        <div class="fo-kpi-value" id="kpiGroupsVal">—</div>
+        <div class="fo-kpi-label" id="kpiGroupsLabel">Groups</div>
+      </div>
+      <div class="fo-kpi-card">
+        <div class="fo-kpi-value" id="kpiUsersVal">—</div>
+        <div class="fo-kpi-label" id="kpiUsersLabel">Users</div>
+      </div>
+      <div class="fo-kpi-card">
+        <div class="fo-kpi-value" id="kpiLicensesVal">—</div>
+        <div class="fo-kpi-label" id="kpiLicensesLabel">Licenses Used</div>
+      </div>
+    </section>
+
+    <!-- ===== Main Grid: Treemap + Donut ===== -->
+    <div class="fo-main-grid">
+      <!-- Group Treemap -->
+      <section class="fo-panel fo-panel--tree" aria-label="Group tree">
+        <div class="fo-panel-title" id="treePanelTitle">Group Hierarchy</div>
+        <div class="chart-container" id="treeChart" aria-label="Group treemap chart"></div>
+      </section>
+
+      <!-- Vehicle Status Donut -->
+      <section class="fo-panel fo-panel--donut" aria-label="Vehicle status">
+        <div class="fo-panel-title" id="donutPanelTitle">Vehicle Status</div>
+        <div class="chart-container" id="donutChart" aria-label="Vehicle status donut chart"></div>
+      </section>
+    </div>
+
+    <!-- ===== License Panel ===== -->
+    <section class="fo-panel fo-panel--license" aria-label="License utilization">
+      <div class="fo-panel-title" id="licensePanelTitle">License Utilization</div>
+      <div class="chart-container--short" id="licenseBar" aria-label="License usage bar chart"></div>
+      <div class="license-body">
+        <div class="license-stats">
+          <div class="license-stat-row">
+            <span id="licenseUsedLabel">Used:</span>
+            <strong id="licenseUsedVal">—</strong>
+          </div>
+          <div class="license-stat-row">
+            <span id="licenseAvailLabel">Available:</span>
+            <strong id="licenseAvailVal">—</strong>
+          </div>
+        </div>
+        <div class="fo-kpi-value" id="licensePctVal" style="font-size:1.5rem">—</div>
+      </div>
+    </section>
+
+    <!-- ===== Admin Panel (hidden for non-admins) ===== -->
+    <section id="adminPanel" hidden aria-label="Admin tools">
+      <h2 id="adminPanelTitle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
+        </svg>
+        Admin Tools
+      </h2>
+
+      <div class="admin-grid">
+
+        <!-- Create Group -->
+        <div class="admin-sub">
+          <h3 id="adminCreateTitle">Create Group</h3>
+          <label class="fo-label" for="newGroupName" id="adminGroupNameLabel">Group Name</label>
+          <input class="fo-input" id="newGroupName" type="text" placeholder="New group name">
+          <label class="fo-label" for="parentGroupSelect" id="adminParentLabel">Parent Group</label>
+          <select class="fo-select" id="parentGroupSelect">
+            <option value="">— Root —</option>
+          </select>
+          <button class="fo-btn fo-btn--primary" id="createGroupBtn" type="button">Create Group</button>
+          <div class="op-status" id="createGroupStatus" aria-live="polite"></div>
+        </div>
+
+        <!-- Bulk Assign Vehicles -->
+        <div class="admin-sub">
+          <h3 id="adminAssignTitle">Bulk Assign Vehicles</h3>
+          <label class="fo-label" for="assignTargetGroup" id="adminTargetGroupLabel">Target Group</label>
+          <select class="fo-select" id="assignTargetGroup">
+            <option value="">— Select group —</option>
+          </select>
+          <div class="admin-form-row" style="margin-top:4px">
+            <input class="fo-input" id="vehicleSearchInput" type="search" placeholder="Filter vehicles…" style="flex:1">
+            <button class="fo-btn fo-btn--secondary fo-btn--sm" id="selectAllVehiclesBtn" type="button">Select All</button>
+          </div>
+          <div class="vehicle-checklist" id="vehicleChecklist" aria-label="Vehicle list"></div>
+          <button class="fo-btn fo-btn--primary" id="assignVehiclesBtn" type="button">Assign Selected</button>
+          <div class="op-status" id="bulkAssignStatus" aria-live="polite"></div>
+        </div>
+
+        <!-- Remove Vehicles from Group -->
+        <div class="admin-sub">
+          <h3 id="adminRemoveTitle">Remove from Group</h3>
+          <label class="fo-label" for="removeSourceGroup" id="adminSourceGroupLabel">Source Group</label>
+          <select class="fo-select" id="removeSourceGroup">
+            <option value="">— Select group —</option>
+          </select>
+          <button class="fo-btn fo-btn--secondary" id="loadGroupVehiclesBtn" type="button">Load Vehicles</button>
+          <div class="vehicle-checklist" id="removeVehicleChecklist" aria-label="Vehicles in group"></div>
+          <button class="fo-btn fo-btn--danger" id="removeVehiclesBtn" type="button">Remove Selected</button>
+          <div class="op-status" id="removeVehiclesStatus" aria-live="polite"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /.fo-container -->
+
+  <!-- ===== Loading Overlay ===== -->
+  <div id="loadingOverlay" hidden aria-live="polite" aria-label="Loading">
+    <div class="fo-spinner"></div>
+    <div id="loadingText">Loading…</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

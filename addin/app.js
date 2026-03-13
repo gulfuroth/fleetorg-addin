@@ -12,22 +12,25 @@ const STRINGS = {
     kpiVehicles: 'Vehicles',
     kpiGroups: 'Groups',
     kpiUsers: 'Users',
+    kpiLicenses: 'Active Devices',
     treePanelTitle: 'Group Hierarchy',
-    donutPanelTitle: 'Vehicle Status',
-    adminPanelTitle: 'Admin Tools',
+    licensePanelTitle: 'Device Plans',
+    licenseUsed: 'Active:',
+    licenseAvail: 'Inactive:',
+    allVehiclesTitle: 'All Vehicles',
     adminCreateTitle: 'Create Group',
     adminGroupNameLabel: 'Group Name',
     adminParentLabel: 'Parent Group',
     adminParentRoot: '— Root —',
     createGroupBtn: 'Create Group',
-    adminAssignTitle: 'Bulk Assign Vehicles',
-    adminTargetGroupLabel: 'Target Group',
+    adminAssignTitle: 'Assign to Group',
+    adminTargetGroupLabel: 'Check vehicles in the table, then assign them to the selected group.',
     adminTargetGroupPlaceholder: '— Select group —',
-    vehicleSearchPlaceholder: 'Filter vehicles…',
+    vehicleSearchPlaceholder: 'Search: name=Ford AND plan=Pro OR last<7…',
     selectAllVehiclesBtn: 'Select All',
-    assignVehiclesBtn: 'Assign Selected',
+    assignVehiclesBtn: 'Assign to Group',
     adminRemoveTitle: 'Remove from Group',
-    adminSourceGroupLabel: 'Source Group',
+    adminSourceGroupLabel: 'Select a group in the hierarchy, check vehicles to remove.',
     adminSourceGroupPlaceholder: '— Select group —',
     loadGroupVehiclesBtn: 'Load Vehicles',
     removeVehiclesBtn: 'Remove Selected',
@@ -36,12 +39,18 @@ const STRINGS = {
     stepDevices: 'Devices',
     stepUsers: 'Users',
     stepStatuses: 'Vehicle Status',
+    stepLicenses: 'Device Plans',
     statusMoving: 'Moving',
     statusStopped: 'Stopped',
     statusIdling: 'Idling',
     statusDisconnected: 'Disconnected',
     langToggle: 'ES',
-    confirmRemove: 'Are you sure you want to remove the selected vehicles from this group? This action cannot be undone.',
+    hideEmptyGroupsLabel: 'Hide empty groups',
+    showSystemGroupsLabel: 'Show system groups',
+    showArchivedDevicesLabel: 'Show archived devices',
+    stepOdometer: 'Odometer',
+    confirmRemove: 'Click again to confirm removal. This cannot be undone.',
+    confirmRemoveBtnLabel: 'Confirm Remove',
     errorNoGroup: 'Please select a group.',
     errorNoName: 'Please enter a group name.',
     errorNoVehicles: 'No vehicles selected.',
@@ -59,22 +68,25 @@ const STRINGS = {
     kpiVehicles: 'Vehículos',
     kpiGroups: 'Grupos',
     kpiUsers: 'Usuarios',
+    kpiLicenses: 'Vehículos Activos',
     treePanelTitle: 'Jerarquía de Grupos',
-    donutPanelTitle: 'Estado de Vehículos',
-    adminPanelTitle: 'Herramientas Admin',
+    licensePanelTitle: 'Planes por Vehículo',
+    licenseUsed: 'Activos:',
+    licenseAvail: 'Inactivos:',
+    allVehiclesTitle: 'Todos los Vehículos',
     adminCreateTitle: 'Crear Grupo',
     adminGroupNameLabel: 'Nombre del Grupo',
     adminParentLabel: 'Grupo Padre',
     adminParentRoot: '— Raíz —',
     createGroupBtn: 'Crear Grupo',
-    adminAssignTitle: 'Asignación Masiva',
-    adminTargetGroupLabel: 'Grupo Destino',
+    adminAssignTitle: 'Asignar a Grupo',
+    adminTargetGroupLabel: 'Marque vehículos en la tabla y asígnelos al grupo seleccionado.',
     adminTargetGroupPlaceholder: '— Seleccione grupo —',
-    vehicleSearchPlaceholder: 'Filtrar vehículos…',
+    vehicleSearchPlaceholder: 'Buscar: name=Ford AND plan=Pro OR last<7…',
     selectAllVehiclesBtn: 'Selec. Todos',
-    assignVehiclesBtn: 'Asignar Seleccionados',
+    assignVehiclesBtn: 'Asignar a Grupo',
     adminRemoveTitle: 'Quitar de Grupo',
-    adminSourceGroupLabel: 'Grupo Origen',
+    adminSourceGroupLabel: 'Seleccione un grupo en la jerarquía y marque los vehículos a quitar.',
     adminSourceGroupPlaceholder: '— Seleccione grupo —',
     loadGroupVehiclesBtn: 'Cargar Vehículos',
     removeVehiclesBtn: 'Quitar Seleccionados',
@@ -83,12 +95,18 @@ const STRINGS = {
     stepDevices: 'Vehículos',
     stepUsers: 'Usuarios',
     stepStatuses: 'Estado de Vehículos',
+    stepLicenses: 'Planes de Vehículo',
     statusMoving: 'En Marcha',
     statusStopped: 'Detenido',
     statusIdling: 'Ralentí',
     statusDisconnected: 'Desconectado',
     langToggle: 'EN',
-    confirmRemove: '¿Está seguro de quitar los vehículos seleccionados de este grupo? Esta acción no se puede deshacer.',
+    hideEmptyGroupsLabel: 'Ocultar grupos vacíos',
+    showSystemGroupsLabel: 'Mostrar grupos del sistema',
+    showArchivedDevicesLabel: 'Mostrar dispositivos archivados',
+    stepOdometer: 'Odómetro',
+    confirmRemove: 'Haga clic de nuevo para confirmar. Esta acción no se puede deshacer.',
+    confirmRemoveBtnLabel: 'Confirmar eliminación',
     errorNoGroup: 'Seleccione un grupo.',
     errorNoName: 'Ingrese un nombre para el grupo.',
     errorNoVehicles: 'No hay vehículos seleccionados.',
@@ -113,37 +131,16 @@ const kpiGroupsVal        = document.getElementById('kpiGroupsVal');
 const kpiGroupsLabel      = document.getElementById('kpiGroupsLabel');
 const kpiUsersVal         = document.getElementById('kpiUsersVal');
 const kpiUsersLabel       = document.getElementById('kpiUsersLabel');
+const kpiLicensesVal      = document.getElementById('kpiLicensesVal');
+const kpiLicensesLabel    = document.getElementById('kpiLicensesLabel');
+
 const treePanelTitle      = document.getElementById('treePanelTitle');
 const treeChartEl         = document.getElementById('treeChart');
-const donutPanelTitle     = document.getElementById('donutPanelTitle');
-const donutChartEl        = document.getElementById('donutChart');
 
-const adminPanel          = document.getElementById('adminPanel');
-const adminPanelTitle     = document.getElementById('adminPanelTitle');
-const adminCreateTitle    = document.getElementById('adminCreateTitle');
-const adminGroupNameLabel = document.getElementById('adminGroupNameLabel');
-const adminParentLabel    = document.getElementById('adminParentLabel');
-const newGroupName        = document.getElementById('newGroupName');
-const parentGroupSelect   = document.getElementById('parentGroupSelect');
-const createGroupBtn      = document.getElementById('createGroupBtn');
-const createGroupStatus   = document.getElementById('createGroupStatus');
 
-const adminAssignTitle      = document.getElementById('adminAssignTitle');
-const adminTargetGroupLabel = document.getElementById('adminTargetGroupLabel');
-const assignTargetGroup     = document.getElementById('assignTargetGroup');
-const vehicleSearchInput    = document.getElementById('vehicleSearchInput');
-const selectAllVehiclesBtn  = document.getElementById('selectAllVehiclesBtn');
-const vehicleChecklist      = document.getElementById('vehicleChecklist');
-const assignVehiclesBtn     = document.getElementById('assignVehiclesBtn');
-const bulkAssignStatus      = document.getElementById('bulkAssignStatus');
-
-const adminRemoveTitle        = document.getElementById('adminRemoveTitle');
-const adminSourceGroupLabel   = document.getElementById('adminSourceGroupLabel');
-const removeSourceGroup       = document.getElementById('removeSourceGroup');
-const loadGroupVehiclesBtn    = document.getElementById('loadGroupVehiclesBtn');
-const removeVehicleChecklist  = document.getElementById('removeVehicleChecklist');
-const removeVehiclesBtn       = document.getElementById('removeVehiclesBtn');
-const removeVehiclesStatus    = document.getElementById('removeVehiclesStatus');
+const vehicleSearchInput = document.getElementById('vehicleSearchInput');
+const groupVehicleTable  = document.getElementById('groupVehicleTable');
+const vehiclePanelTitle  = document.getElementById('vehiclePanelTitle');
 
 const loadingOverlay = document.getElementById('loadingOverlay');
 const loadingText    = document.getElementById('loadingText');
@@ -158,11 +155,29 @@ const state = {
   devices: [],
   users: [],
   deviceStatuses: [],
+  devicePlans: null,
+  devicePlanMap: null,
+  isAdmin: false,
   groupTree: null,
   lang: 'en',
-  adminSelectedVehicles: new Set(),
-  adminRemoveSelected: new Set(),
+  editSelectedDevices: new Set(),
   vehicleFilterText: '',
+  selectedGroupId: null,
+  editMode: false,
+  pendingChanges: [],
+  editGroupId: null,
+  editGroupName: '',
+  editLockedGroupId: null,
+  hideEmptyGroups: false,
+  showSystemGroups: false,
+  showArchivedDevices: false,
+  treePanelExpanded: false,
+  activeDevices: [],
+  allDevices: null,
+  odometerMap: new Map(),
+  tableSort: { column: null, direction: 'asc' },
+  columnFilters: {},
+  showRelativeDates: true,
 };
 
 // =============================================================
@@ -184,7 +199,7 @@ function setOpStatus(el, msg, isError = false) {
   el.className = 'op-status ' + (isError ? 'error' : 'success');
 }
 
-const LOAD_STEPS = ['groups', 'devices', 'users', 'statuses']; // 'licenses' disabled
+const LOAD_STEPS = ['groups', 'devices', 'statuses', 'odometer', 'licenses'];
 
 function stepKey(id) {
   return 'step' + id.charAt(0).toUpperCase() + id.slice(1);
@@ -232,6 +247,22 @@ function hideLoading() {
   loadingOverlay.setAttribute('hidden', '');
 }
 
+function escapeHtml(str) {
+  if (str == null || str === '') return '—';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function formatConnectDate(dateStr) {
+  if (!dateStr) return '—';
+  const ms = Date.now() - new Date(dateStr).getTime();
+  if (ms < 0) return '—';
+  if (state.showRelativeDates) {
+    const days = Math.floor(ms / 86400000);
+    return days === 0 ? 'Today' : `${days}d ago`;
+  }
+  return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
 /** Wraps api.call in a Promise */
 function apiCall(method, params) {
   return new Promise((resolve, reject) => {
@@ -244,47 +275,82 @@ function apiCall(method, params) {
 // =============================================================
 
 /**
- * Build a nested group tree annotated with vehicleCount and userCount.
- * Returns a synthetic root node whose children are top-level groups.
+ * Build a nested group tree rooted at the Geotab Company Group.
+ * Each node has:
+ *   directCount  – vehicles directly assigned to this group
+ *   vehicleCount – directCount + sum of all descendants (used for display totals)
+ *   userCount    – same propagation logic for users
+ * Returns the Company Group node (id: 'GroupCompanyId').
+ * Callers should render root.children (not the root itself).
  */
-function buildGroupTree(groups, devices, users) {
+function buildGroupTree(groups, devices, users, showSystemGroups) {
+  // Build node map.
+  // IMPORTANT: the Geotab API returns each group with a `children` array of
+  // {id} references — NOT a `parent` field. We preserve those refs separately
+  // so we can wire the tree, then replace children with actual node objects.
   const byId = new Map();
   for (const g of groups) {
-    byId.set(g.id, { ...g, vehicleCount: 0, userCount: 0, children: [] });
+    byId.set(g.id, {
+      id: g.id,
+      name: g.name,
+      color: g.color,
+      reference: g.reference,
+      _childRefs: (g.children || []).map((c) => c.id || c),
+      directCount: 0,
+      vehicleCount: 0,
+      userCount: 0,
+      children: [],
+    });
   }
 
-  // Count devices per group (devices can belong to multiple groups)
-  for (const d of devices) {
-    const dGroups = d.groups || [];
-    for (const gRef of dGroups) {
-      if (byId.has(gRef.id)) {
-        byId.get(gRef.id).vehicleCount += 1;
-      }
-    }
-  }
-
-  // Count users per group using companyGroups (preferred) or groups
-  for (const u of users) {
-    const uGroups = u.companyGroups || u.groups || [];
-    for (const gRef of uGroups) {
-      if (byId.has(gRef.id)) {
-        byId.get(gRef.id).userCount += 1;
-      }
-    }
-  }
-
-  // Wire up parent-child relationships
-  const roots = [];
+  // Wire the tree: replace _childRefs with actual node objects
   for (const node of byId.values()) {
-    const parentId = node.parent && node.parent.id;
-    if (parentId && byId.has(parentId)) {
-      byId.get(parentId).children.push(node);
-    } else {
-      roots.push(node);
+    for (const childId of node._childRefs) {
+      const child = byId.get(childId);
+      if (child) node.children.push(child);
     }
   }
 
-  // Propagate counts up the tree so parent tiles reflect descendants
+  // Count direct device memberships.
+  // Device.groups contains the group(s) the device is directly assigned to.
+  // If the API also returns ancestor groups for a device, de-duplicate by only
+  // crediting the most-specific (deepest) group per branch.
+  for (const d of devices) {
+    const dGroupIds = new Set((d.groups || []).map((g) => g.id));
+    for (const gId of dGroupIds) {
+      const node = byId.get(gId);
+      if (!node) continue;
+      const hasChildInGroups = node.children.some((c) => dGroupIds.has(c.id));
+      if (!hasChildInGroups) {
+        node.directCount += 1;
+        node.vehicleCount += 1;
+      }
+    }
+  }
+
+  // Count users per group (direct membership)
+  for (const u of users) {
+    for (const gRef of (u.companyGroups || u.groups || [])) {
+      if (byId.has(gRef.id)) byId.get(gRef.id).userCount += 1;
+    }
+  }
+
+  // Geotab system group IDs follow the pattern 'Group<UpperCamelCase>Id'.
+  // These are auto-classification groups (asset type, powertrain, driver activity, etc.)
+  // and pollute the organisational hierarchy view. Remove them and their subtrees.
+  const SYS_GROUP = /^Group[A-Z]/;
+  function pruneSystemGroups(node) {
+    node.children = node.children.filter((c) => !SYS_GROUP.test(c.id));
+    for (const child of node.children) pruneSystemGroups(child);
+  }
+
+  // Sort children alphabetically at every level
+  function sortChildren(node) {
+    node.children.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    for (const child of node.children) sortChildren(child);
+  }
+
+  // Propagate totals upward: parent total = direct + sum(children totals)
   function propagate(node) {
     for (const child of node.children) {
       propagate(child);
@@ -293,43 +359,193 @@ function buildGroupTree(groups, devices, users) {
     }
   }
 
-  const syntheticRoot = {
-    id: '__root__',
-    name: 'Fleet',
-    vehicleCount: 0,
-    userCount: 0,
-    children: roots,
-  };
-  propagate(syntheticRoot);
+  // The organisational root in Geotab is always 'GroupCompanyId'
+  const companyNode = byId.get('GroupCompanyId');
+  if (companyNode) {
+    if (!showSystemGroups) pruneSystemGroups(companyNode);
+    sortChildren(companyNode);
+    propagate(companyNode);
+    return companyNode;
+  }
 
+  // Fallback: synthetic root using groups that have no parent in our set
+  const childIdSet = new Set([...byId.values()].flatMap((n) => n._childRefs));
+  const roots = [...byId.values()].filter((n) => !childIdSet.has(n.id));
+  const syntheticRoot = {
+    id: '__root__', name: 'Fleet',
+    directCount: 0, vehicleCount: 0, userCount: 0, children: roots, _childRefs: [],
+  };
+  sortChildren(syntheticRoot);
+  propagate(syntheticRoot);
   return syntheticRoot;
+}
+
+// Plan keys that represent inactive/non-billable devices
+const PLAN_INACTIVE = new Set(['Suspend', 'Terminate']);
+
+// Geotab DevicePlan enum → human-readable label
+const PLAN_DISPLAY = {
+  'ProPlus':      'Pro Plus',
+  'Pro':          'Pro',
+  'Base':         'Go Plan',
+  'Intermediate': 'Intermediate',
+  'RateBasePlan': 'Rate Base',
+  'GoTalk':       'GoTalk',
+  'Suspend':      'Suspended',
+  'Terminate':    'Terminated',
+};
+
+// Colour per plan (active plans = teal/green family, inactive = amber/red)
+const PLAN_COLORS = {
+  'ProPlus':      '#0f766e',
+  'Pro':          '#0d9488',
+  'Base':         '#22c55e',
+  'Intermediate': '#4ade80',
+  'RateBasePlan': '#64748b',
+  'GoTalk':       '#6ee7b7',
+  'Suspend':      '#f59e0b',
+  'Terminate':    '#b91c1c',
+};
+
+/**
+ * Aggregate DevicePlanBillingInfo records into plan counts.
+ * Returns { plans: [{key, label, count, active}], total, active }
+ */
+function parseDevicePlans(planBillingInfo) {
+  const counts = {};
+  for (const info of (planBillingInfo || [])) {
+    const key = info.devicePlan || 'Unknown';
+    counts[key] = (counts[key] || 0) + 1;
+  }
+
+  const plans = Object.entries(counts)
+    .map(([key, count]) => ({
+      key,
+      label:  PLAN_DISPLAY[key] || key,
+      count,
+      active: !PLAN_INACTIVE.has(key),
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const total  = plans.reduce((s, p) => s + p.count, 0);
+  const active = plans.filter((p) => p.active).reduce((s, p) => s + p.count, 0);
+
+  return { plans, total, active };
 }
 
 // =============================================================
 // 6. Chart instances
 // =============================================================
-let treeChartInstance  = null;
-let donutChartInstance = null;
+let treeChartInstance    = null;
+let mindmapChartInstance = null;
+let treeChartData        = null; // last data array passed to setOption, used for node lookup
+let vehicleDisplayCount  = 0;   // count of rows currently shown in the table
 
 // =============================================================
 // 7. Render Functions
 // =============================================================
 
+function renderTreeView() {
+  const container = document.getElementById('mindmapChart');
+  if (!container) return;
+  const root = state.groupTree;
+  if (!root) { container.innerHTML = ''; return; }
+
+  function shouldInclude(node) {
+    if (!state.hideEmptyGroups) return true;
+    // Include if this node or any descendant has vehicles
+    if (node.vehicleCount > 0) return true;
+    return node.children && node.children.some(shouldInclude);
+  }
+
+  function buildNode(node, depth) {
+    if (!shouldInclude(node)) return '';
+    const visibleChildren = (node.children || []).filter(shouldInclude);
+    const hasChildren = visibleChildren.length > 0;
+    const isSelected = node.id === state.selectedGroupId;
+    const total  = node.vehicleCount || 0;
+    const direct = node.directCount  || 0;
+    const countLabel = total > 0
+      ? `<span class="htree-count" title="${direct} direct">${total}</span>`
+      : '';
+
+    if (hasChildren) {
+      const childrenHtml = visibleChildren.map((c) => buildNode(c, depth + 1)).join('');
+      return `<details class="htree-node" open>
+        <summary class="htree-label${isSelected ? ' htree-label--selected' : ''}" data-gid="${node.id}">
+          <span class="htree-name">${escapeHtml(node.name || node.id)}</span>
+          ${countLabel}
+        </summary>
+        <div class="htree-children">${childrenHtml}</div>
+      </details>`;
+    } else {
+      return `<div class="htree-leaf${isSelected ? ' htree-label--selected' : ''}" data-gid="${node.id}">
+        <span class="htree-name">${escapeHtml(node.name || node.id)}</span>
+        ${countLabel}
+      </div>`;
+    }
+  }
+
+  const topNodes = (root.children || []).filter(shouldInclude);
+  container.innerHTML = topNodes.map((c) => buildNode(c, 0)).join('');
+
+  container.querySelectorAll('[data-gid]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      // Stop bubbling so parent <summary> nodes don't also fire selectGroup
+      e.stopPropagation();
+      selectGroup(el.dataset.gid);
+      // Update selected highlight without full re-render
+      container.querySelectorAll('.htree-label--selected').forEach((s) => s.classList.remove('htree-label--selected'));
+      el.classList.add('htree-label--selected');
+    });
+  });
+}
+
 function renderKpis() {
   kpiVehiclesVal.textContent = state.devices.length.toLocaleString();
   kpiGroupsVal.textContent   = state.groups.length.toLocaleString();
-  kpiUsersVal.textContent    = state.users.length.toLocaleString();
 
+  const dp = state.devicePlans;
+  kpiLicensesVal.textContent = dp ? dp.active.toLocaleString() : '—';
+}
+
+function hasAnyVehicles(node) {
+  if (node.vehicleCount > 0) return true;
+  return node.children && node.children.some(hasAnyVehicles);
+}
+
+// Walk option data + ECharts internal tree in parallel to find the internal node
+// reference by groupId. treemapRootToNode requires reference equality, so we
+// cannot use data from getOption() (which returns clones).
+function findInternalTreeNode(optNodes, internalNodes, groupId) {
+  for (let i = 0; i < optNodes.length; i++) {
+    const opt    = optNodes[i];
+    const intern = internalNodes && internalNodes[i];
+    if (!intern) continue;
+    if (opt.groupId === groupId) return intern;
+    if (opt.children && intern.children) {
+      const found = findInternalTreeNode(opt.children, intern.children, groupId);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 function toEChartsNodes(nodes) {
-  return nodes.map((n) => ({
-    name: n.name,
-    value: Math.max(n.vehicleCount, 1),
-    vehicleCount: n.vehicleCount,
-    userCount: n.userCount,
-    children: n.children && n.children.length ? toEChartsNodes(n.children) : undefined,
-  }));
+  const filtered = state.hideEmptyGroups ? nodes.filter(hasAnyVehicles) : nodes;
+  return filtered.map((n) => {
+    const visibleChildren = state.hideEmptyGroups ? (n.children || []).filter(hasAnyVehicles) : (n.children || []);
+    const children = visibleChildren.length ? toEChartsNodes(visibleChildren) : undefined;
+    return {
+      name: n.name,
+      groupId: n.id,
+      value: Math.max(n.vehicleCount, 1),
+      vehicleCount: n.vehicleCount,
+      directCount: n.directCount,
+      childCount: visibleChildren.length,
+      children: children && children.length ? children : undefined,
+    };
+  });
 }
 
 function renderTreeChart() {
@@ -340,15 +556,22 @@ function renderTreeChart() {
   const root = state.groupTree;
   if (!root) return;
 
-  const data = toEChartsNodes(root.children && root.children.length ? root.children : [root]);
+  treeChartData = toEChartsNodes(root.children && root.children.length ? root.children : [root]);
+  const data = treeChartData;
 
   const tooltipFormatter = (params) => {
     const d = params.data;
-    return [
-      `<strong>${d.name}</strong>`,
-      `${t('kpiVehicles')}: ${d.vehicleCount ?? 0}`,
-      `${t('kpiUsers')}: ${d.userCount ?? 0}`,
-    ].join('<br>');
+    const total  = d.vehicleCount ?? 0;
+    const direct = d.directCount  ?? 0;
+    const sub    = total - direct;
+    const childCount = d.childCount ?? 0;
+    const lines = [`<strong>${d.name}</strong>`];
+    const vehicleLine = sub > 0
+      ? `${t('kpiVehicles')}: ${total} (${direct} direct + ${sub} in subgroups)`
+      : `${t('kpiVehicles')}: ${total}`;
+    lines.push(vehicleLine);
+    if (childCount > 0) lines.push(`Subgroups: ${childCount}`);
+    return lines.join('<br>');
   };
 
   treeChartInstance.setOption({
@@ -358,12 +581,23 @@ function renderTreeChart() {
     series: [{
       type: 'treemap',
       data,
-      roam: false,
+      roam: 'scale',
       leafDepth: 1,
       breadcrumb: { show: true, bottom: 8 },
       label: {
         show: true,
-        formatter: '{b}',
+        formatter: (params) => {
+          const d = params.data;
+          const total  = d.vehicleCount ?? 0;
+          const direct = d.directCount  ?? 0;
+          const groups = d.childCount   ?? 0;
+          const parts = [d.name];
+          if (total > 0) {
+            parts.push(direct < total ? `${direct} vehicles (${total} total)` : `${direct} vehicles`);
+          }
+          if (groups > 0) parts.push(`${groups} subgroups`);
+          return parts.join('\n');
+        },
         fontSize: 12,
         color: '#fff',
       },
@@ -392,57 +626,108 @@ function renderTreeChart() {
       emphasis: { focus: 'self' },
     }],
   }, true);
+
+  treeChartInstance.off('click');
+  treeChartInstance.on('click', (params) => {
+    if (params.data && params.data.groupId) {
+      selectGroup(params.data.groupId);
+    }
+  });
 }
 
-function renderDonutChart() {
-  if (!donutChartInstance) {
-    donutChartInstance = echarts.init(donutChartEl);
-  }
+function toggleTreePanelExpand() {
+  const panel = document.querySelector('.fo-panel[aria-label="Group hierarchy"]');
+  const btn   = document.getElementById('btnExpandTree');
+  if (!panel || !btn) return;
 
-  // Classify statuses
-  let moving = 0, stopped = 0, idling = 0, disconnected = 0;
+  state.treePanelExpanded = !state.treePanelExpanded;
+  panel.classList.toggle('fo-panel--fullscreen', state.treePanelExpanded);
+  document.body.classList.toggle('fo-has-fullscreen', state.treePanelExpanded);
 
-  for (const s of state.deviceStatuses) {
-    if (!s.isDeviceCommunicating) {
-      disconnected += 1;
-    } else if (s.isDriving) {
-      moving += 1;
-    } else if (s.speed > 0) {
-      idling += 1;
-    } else {
-      stopped += 1;
+  // Swap icon: expand ↔ compress
+  btn.innerHTML = state.treePanelExpanded
+    ? `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8">
+        <polyline points="5,1 1,1 1,5"/><polyline points="9,13 13,13 13,9"/>
+        <line x1="1" y1="1" x2="6" y2="6"/><line x1="13" y1="13" x2="8" y2="8"/>
+       </svg>`
+    : `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8">
+        <polyline points="9,1 13,1 13,5"/><polyline points="5,13 1,13 1,9"/>
+        <line x1="13" y1="1" x2="8" y2="6"/><line x1="1" y1="13" x2="6" y2="8"/>
+       </svg>`;
+
+  // Let the layout settle, then resize the ECharts treemap to fill the new space
+  setTimeout(() => {
+    if (treeChartInstance) treeChartInstance.resize();
+  }, 50);
+}
+
+function selectGroup(groupId) {
+  state.selectedGroupId = groupId;
+  const g = state.groups.find((g) => g.id === groupId);
+
+  // In edit mode the device panel is locked — only update the sidebar group selector
+  if (state.editMode) {
+    if (g) {
+      state.editGroupId   = g.id;
+      state.editGroupName = g.name || g.id;
+      const searchEl = document.getElementById('editGroupSearch');
+      if (searchEl) searchEl.value = state.editGroupName;
     }
+    return; // device table stays frozen
   }
 
-  donutChartInstance.setOption({
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: {c} ({d}%)',
-    },
-    legend: {
-      orient: 'vertical',
-      right: 8,
-      top: 'center',
-      textStyle: { fontSize: 12 },
-    },
-    series: [{
-      type: 'pie',
-      radius: ['40%', '70%'],
-      center: ['40%', '50%'],
-      avoidLabelOverlap: false,
-      itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-      label: { show: false },
-      emphasis: {
-        label: { show: true, fontSize: 13, fontWeight: 'bold' },
-      },
-      data: [
-        { value: moving,       name: t('statusMoving'),       itemStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--fo-chart-moving').trim()       || '#22c55e' } },
-        { value: stopped,      name: t('statusStopped'),      itemStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--fo-chart-stopped').trim()      || '#f59e0b' } },
-        { value: idling,       name: t('statusIdling'),       itemStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--fo-chart-idling').trim()       || '#3b82f6' } },
-        { value: disconnected, name: t('statusDisconnected'), itemStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--fo-chart-disconnected').trim() || '#94a3b8' } },
-      ],
-    }],
-  }, true);
+  const title = g ? (g.name || groupId) : t('allVehiclesTitle');
+  vehiclePanelTitle.textContent = title;
+
+  // Sync edit group search to follow tree selection (only when not in edit mode)
+  if (g) {
+    state.editGroupId   = g.id;
+    state.editGroupName = g.name || g.id;
+    const searchEl = document.getElementById('editGroupSearch');
+    if (searchEl) searchEl.value = state.editGroupName;
+  }
+
+  refreshVehicleTable();
+}
+
+// Collect a group and all its descendant IDs into a Set
+function getGroupIdSet(groupId) {
+  const ids = new Set();
+  function collectAll(node) {
+    ids.add(node.id);
+    (node.children || []).forEach(collectAll);
+  }
+  function find(node) {
+    if (node.id === groupId) { collectAll(node); return; }
+    (node.children || []).forEach(find);
+  }
+  if (state.groupTree) find(state.groupTree);
+  return ids;
+}
+
+function refreshVehicleTable() {
+  const groupId = state.editMode ? state.editLockedGroupId : state.selectedGroupId;
+  let devices;
+  if (groupId) {
+    const groupIds = getGroupIdSet(groupId);
+    devices = state.devices.filter((d) => (d.groups || []).some((g) => groupIds.has(g.id)));
+  } else {
+    devices = state.devices;
+  }
+  const selectedSet = state.editMode ? state.editSelectedDevices : null;
+  renderVehicleTable(groupVehicleTable, devices, selectedSet, state.vehicleFilterText);
+}
+
+
+function renderPlanPills() {
+  const el = document.getElementById('planPills');
+  if (!el) return;
+  const dp = state.devicePlans;
+  if (!dp || !dp.plans.length) { el.innerHTML = ''; return; }
+  el.innerHTML = dp.plans.map((p) => {
+    const color = PLAN_COLORS[p.key] || '#94a3b8';
+    return `<span class="plan-pill" style="background:${color}" title="${p.label}">${p.label}: <strong>${p.count}</strong></span>`;
+  }).join('');
 }
 
 // =============================================================
@@ -460,41 +745,83 @@ async function loadAllData() {
     const groups = await apiCall('Get', { typeName: 'Group' });
     state.groups = groups || [];
     markStepDone('groups', state.groups.length);
-    state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
+    state.groupTree = buildGroupTree(state.groups, state.devices, state.users, state.showSystemGroups);
     renderTreeChart();
     renderKpis();
 
-    // Step 2: Devices — largest dataset, re-renders tree with vehicle counts
+    // Step 2: Devices — use fromDate=now to get only active devices
     markStepLoading('devices');
-    const devices = await apiCall('Get', { typeName: 'Device', resultsLimit: 50000 });
-    state.devices = devices || [];
+    const nowIso = new Date().toISOString();
+    const devices = await apiCall('Get', { typeName: 'Device', search: { fromDate: nowIso }, resultsLimit: 50000 });
+    state.activeDevices = devices || [];
+    state.devices = state.activeDevices;
     markStepDone('devices', state.devices.length);
-    state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
+    state.groupTree = buildGroupTree(state.groups, state.devices, state.users, state.showSystemGroups);
     renderTreeChart();
     renderKpis();
 
-    // Step 3: Users — adds user counts to the tree
-    markStepLoading('users');
-    const users = await apiCall('Get', { typeName: 'User', resultsLimit: 10000 });
-    state.users = users || [];
-    markStepDone('users', state.users.length);
-    state.groupTree = buildGroupTree(state.groups, state.devices, state.users);
-    renderTreeChart();
-    renderKpis();
-
-    // Step 4: Device status — powers the donut chart
+    // Step 3: Device status
     markStepLoading('statuses');
     const statuses = await apiCall('Get', { typeName: 'DeviceStatusInfo', resultsLimit: 50000 });
     state.deviceStatuses = statuses || [];
     markStepDone('statuses', state.deviceStatuses.length);
-    renderDonutChart();
 
-    // Admin panel — only for system admins
-    if (state.user && state.user.isSystemAdminUser) {
-      adminPanel.removeAttribute('hidden');
-      populateAdminSelects();
-      renderVehicleChecklist(vehicleChecklist, state.devices, state.adminSelectedVehicles);
+    // Step 5: Odometer — latest StatusData record per device for DiagnosticOdometerId
+    markStepLoading('odometer');
+    try {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const odomData = await apiCall('Get', {
+        typeName: 'StatusData',
+        search: { diagnosticSearch: { id: 'DiagnosticOdometerId' }, fromDate: thirtyDaysAgo },
+        resultsLimit: 50000,
+      });
+      // Keep most recent record per device (API returns oldest-first, so iterate in reverse)
+      const odomMap = new Map();
+      for (const rec of (odomData || [])) {
+        const devId = rec.device && rec.device.id;
+        if (!devId || rec.data == null) continue;
+        const existing = odomMap.get(devId);
+        if (!existing || rec.dateTime > existing.dateTime) odomMap.set(devId, rec);
+      }
+      state.odometerMap = odomMap;
+      markStepDone('odometer', odomMap.size);
+    } catch (e) {
+      state.odometerMap = new Map();
+      markStepError('odometer');
     }
+    refreshVehicleTable();
+
+    // Step 6: Device plan info — read from devicePlans[] field on each Device object
+    markStepLoading('licenses');
+    const withPlan = state.devices.filter((d) => d.devicePlans && d.devicePlans.length > 0);
+    const synth = withPlan.map((d) => ({ devicePlan: d.devicePlans[0], device: { id: d.id } }));
+    state.devicePlanMap = new Map(withPlan.map((d) => [d.id, { devicePlan: d.devicePlans[0] }]));
+    state.devicePlans = parseDevicePlans(synth);
+    markStepDone('licenses', state.devicePlans.total);
+    renderPlanPills();
+    renderKpis();
+
+    // Detect admin: fetch the current session user and check security groups.
+    // freshState.user is unreliable in MyGeotab add-ins; use getSession() instead.
+    try {
+      const session = await new Promise((res) => state.api.getSession(res));
+      const curUsers = await apiCall('Get', { typeName: 'User', search: { name: session.userName }, resultsLimit: 1 });
+      const curUser = curUsers && curUsers[0];
+      const ADMIN_SG = new Set(['GroupEverythingSecurityId', 'GroupAdministratorSecurityId', 'GroupSupervisorSecurityId']);
+      state.isAdmin = !!(curUser && (
+        curUser.isAdministrator || curUser.isSystemAdminUser ||
+        (curUser.securityGroups || []).some((g) => ADMIN_SG.has(g.id))
+      ));
+    } catch (_) {
+      state.isAdmin = false;
+    }
+
+    // Show vehicle panel for all users
+    refreshVehicleTable();
+
+    // Show Edit button for admins only
+    const editBtn = document.getElementById('btnEditMode');
+    if (editBtn) editBtn.hidden = !state.isAdmin;
 
     setStatus(t('statusReady'));
   } catch (err) {
@@ -508,79 +835,750 @@ async function loadAllData() {
 // 9. Admin Functions
 // =============================================================
 
-function populateAdminSelects() {
-  const sortedGroups = [...state.groups].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+// =============================================================
+// 9. Edit Mode
+// =============================================================
 
-  function buildOptions(placeholder) {
-    return `<option value="">${placeholder}</option>` +
-      sortedGroups.map((g) => `<option value="${g.id}">${g.name || g.id}</option>`).join('');
-  }
-
-  parentGroupSelect.innerHTML   = `<option value="">${t('adminParentRoot')}</option>` +
-    sortedGroups.map((g) => `<option value="${g.id}">${g.name || g.id}</option>`).join('');
-  assignTargetGroup.innerHTML   = buildOptions(t('adminTargetGroupPlaceholder'));
-  removeSourceGroup.innerHTML   = buildOptions(t('adminSourceGroupPlaceholder'));
+function refreshVehicleCountBadge() {
+  const el = document.getElementById('vehicleCountBadge');
+  if (!el) return;
+  const sel = state.editMode ? state.editSelectedDevices.size : 0;
+  el.textContent = sel > 0
+    ? `${vehicleDisplayCount} vehicles (${sel} selected)`
+    : `${vehicleDisplayCount} vehicles`;
 }
 
-function renderVehicleChecklist(container, devices, selectedSet) {
-  const filterText = state.vehicleFilterText.toLowerCase();
-  const filtered   = filterText
-    ? devices.filter((d) => (d.name || '').toLowerCase().includes(filterText))
-    : devices;
+function refreshEditBtn() {
+  const btn = document.getElementById('btnEditMode');
+  if (!btn) return;
+  if (!state.editMode) {
+    btn.textContent = 'Edit';
+    btn.classList.remove('fo-btn--primary');
+    btn.classList.add('fo-btn--ghost');
+  } else if (state.pendingChanges.length === 0) {
+    btn.textContent = 'Back';
+    btn.classList.remove('fo-btn--primary');
+    btn.classList.add('fo-btn--ghost');
+  } else {
+    btn.textContent = 'Save';
+    btn.classList.add('fo-btn--primary');
+    btn.classList.remove('fo-btn--ghost');
+  }
+}
 
-  const sorted = [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+function setEditMode(active) {
+  state.editMode = active;
+  state.editLockedGroupId = active ? state.selectedGroupId : null;
+  state.editSelectedDevices.clear();
+  refreshEditBtn();
+  const panel = document.getElementById('editPanel');
+  if (panel) panel.hidden = !active;
 
-  if (sorted.length === 0) {
-    container.innerHTML = '<div style="padding:8px 10px;color:var(--fo-muted);font-size:12px;">No vehicles found.</div>';
-    return;
+  if (!active) {
+    // Reset staged panel DOM so it's clean on next open
+    const stagedPanel = document.getElementById('editStagedPanel');
+    const stagedList  = document.getElementById('editStagedList');
+    if (stagedPanel) stagedPanel.hidden = true;
+    if (stagedList)  stagedList.innerHTML = '';
+    // Clear any op status messages
+    ['editAddStatus', 'editCreateStatus'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.className = 'op-status'; }
+    });
+  } else {
+    // Pre-fill group search from current tree selection
+    const g = state.groups.find((g) => g.id === (state.editGroupId || state.selectedGroupId));
+    if (g) {
+      state.editGroupId   = g.id;
+      state.editGroupName = g.name || g.id;
+      const searchEl = document.getElementById('editGroupSearch');
+      if (searchEl) searchEl.value = state.editGroupName;
+    }
+    // Render any already-staged changes (e.g. re-entering after Cancel on modal)
+    renderPendingSummary();
   }
 
-  container.innerHTML = sorted.map((d) => {
-    const checked = selectedSet.has(d.id) ? 'checked' : '';
-    const name    = d.name || d.serialNumber || d.id;
-    return `<label><input type="checkbox" data-id="${d.id}" ${checked}> ${name}</label>`;
+  if (!active) {
+    // Restore panel title to match current tree selection (may differ from locked group)
+    const g = state.groups.find((g) => g.id === state.selectedGroupId);
+    vehiclePanelTitle.textContent = g ? (g.name || state.selectedGroupId) : t('allVehiclesTitle');
+  }
+
+  refreshVehicleTable();
+}
+
+function renderPendingSummary() {
+  const changes = state.pendingChanges;
+  const panel   = document.getElementById('editStagedPanel');
+  const list    = document.getElementById('editStagedList');
+  refreshEditBtn();
+  if (!panel || !list) return;
+
+  if (!changes.length) { panel.hidden = true; return; }
+  panel.hidden = false;
+
+  list.innerHTML = changes.map((c, i) => {
+    let text;
+    if (c.type === 'add') {
+      text = `Add <strong>${c.deviceIds.size}</strong> device(s) → <strong>${escapeHtml(c.groupName)}</strong>`;
+    } else if (c.type === 'remove') {
+      text = `Remove <strong>${escapeHtml(c.deviceName)}</strong> from <strong>${escapeHtml(c.groupName)}</strong>`;
+    } else {
+      text = `Create group <strong>${escapeHtml(c.name)}</strong> (parent: <strong>${escapeHtml(c.parentName)}</strong>)`;
+    }
+    return `<div class="edit-pending-item">
+      <span>${text}</span>
+      <button class="edit-pending-del" data-idx="${i}" title="Remove">✕</button>
+    </div>`;
   }).join('');
 
-  // Sync checkboxes to selectedSet
-  container.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-    cb.addEventListener('change', () => {
-      const id = cb.dataset.id;
-      if (cb.checked) selectedSet.add(id);
-      else            selectedSet.delete(id);
+  list.querySelectorAll('.edit-pending-del').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.pendingChanges.splice(parseInt(btn.dataset.idx), 1);
+      renderPendingSummary();
+      refreshVehicleTable();
     });
   });
 }
 
-async function createGroup() {
-  const name = newGroupName.value.trim();
-  if (!name) {
-    setOpStatus(createGroupStatus, t('errorNoName'), true);
+function openConfirmModal() {
+  const modal   = document.getElementById('confirmModal');
+  const summary = document.getElementById('confirmSummary');
+  if (!modal || !summary) return;
+
+  const lines = state.pendingChanges.map((c) => {
+    if (c.type === 'add') {
+      return `<li>Add <strong>${c.deviceIds.size}</strong> device(s) to group <strong>${escapeHtml(c.groupName)}</strong></li>`;
+    } else if (c.type === 'remove') {
+      return `<li>Remove <strong>${escapeHtml(c.deviceName)}</strong> from group <strong>${escapeHtml(c.groupName)}</strong></li>`;
+    } else {
+      return `<li>Create group <strong>${escapeHtml(c.name)}</strong> (parent: <strong>${escapeHtml(c.parentName)}</strong>)</li>`;
+    }
+  });
+  summary.innerHTML = `<ul class="confirm-list">${lines.join('')}</ul>`;
+  modal.hidden = false;
+}
+
+async function applyPendingChanges() {
+  const changes  = [...state.pendingChanges];
+  const applyBtn = document.getElementById('confirmApply');
+  const modal    = document.getElementById('confirmModal');
+  const summary  = document.getElementById('confirmSummary');
+
+  if (applyBtn) { applyBtn.disabled = true; applyBtn.textContent = 'Applying…'; }
+
+  // Helper: create one group via direct callback API (same pattern as original working code)
+  function createOneGroup(name, parentId) {
+    return new Promise((resolve, reject) => {
+      state.api.call(
+        'Add',
+        { typeName: 'Group', entity: { name, parent: { id: parentId } } },
+        resolve,
+        (err) => reject(new Error(err && err.message ? err.message : String(err)))
+      );
+    });
+  }
+
+  function showApplyError(msg) {
+    if (applyBtn) { applyBtn.disabled = false; applyBtn.textContent = 'Apply Changes'; }
+    if (summary) {
+      // Remove previous error if any
+      summary.querySelectorAll('.apply-error').forEach((el) => el.remove());
+      summary.insertAdjacentHTML('beforeend',
+        `<p class="op-status error apply-error" style="margin-top:8px">${escapeHtml(msg)}</p>`);
+    }
+  }
+
+  try {
+    const deviceMap = new Map(state.devices.map((d) => [d.id, d]));
+    const setCalls  = [];
+    const tempIdMap = new Map(); // tempId → real Geotab group ID
+
+    // Process creates first (serial)
+    const createChanges = changes.filter((c) => c.type === 'createGroup');
+    for (const c of createChanges) {
+      await createOneGroup(c.name, c.parentId || 'GroupCompanyId');
+    }
+
+    // Re-fetch groups to get real IDs (callback may not return the ID in all SDK versions)
+    if (createChanges.length) {
+      const freshGroups = await apiCall('Get', { typeName: 'Group' });
+      for (const c of createChanges) {
+        if (!c.tempId) continue;
+        const match = freshGroups.find(
+          (g) => g.name === c.name && (g.parent?.id === c.parentId || (!c.parentId && g.parent?.id === 'GroupCompanyId'))
+        );
+        if (match) tempIdMap.set(c.tempId, match.id);
+      }
+    }
+
+    // Build Set calls for add/remove, resolving any temp group IDs
+    for (const c of changes) {
+      if (c.type === 'add') {
+        const groupId = tempIdMap.get(c.groupId) || c.groupId;
+        if (!groupId || groupId.startsWith('_pending_')) continue; // unresolved temp
+        for (const deviceId of c.deviceIds) {
+          const device = deviceMap.get(deviceId);
+          if (!device) continue;
+          const existing = (device.groups || []).map((g) => ({ id: g.id }));
+          if (!existing.some((g) => g.id === groupId)) {
+            setCalls.push(['Set', { typeName: 'Device', entity: { id: device.id, groups: [...existing, { id: groupId }] } }]);
+          }
+        }
+      } else if (c.type === 'remove') {
+        const device = deviceMap.get(c.deviceId);
+        if (!device) continue;
+        const newGroups = (device.groups || []).filter((g) => g.id !== c.groupId).map((g) => ({ id: g.id }));
+        setCalls.push(['Set', { typeName: 'Device', entity: { id: device.id, groups: newGroups } }]);
+      }
+    }
+
+    if (setCalls.length) await batchedMultiCall(setCalls);
+
+    state.pendingChanges = [];
+    if (modal) modal.hidden = true;
+    setEditMode(false);
+    loadAllData();
+  } catch (err) {
+    showApplyError(err && err.message ? err.message : String(err));
+  }
+}
+
+function getPlanLabel(device) {
+  if (state.devicePlanMap) {
+    const info = state.devicePlanMap.get(device.id);
+    if (info && info.devicePlan) return PLAN_DISPLAY[info.devicePlan] || info.devicePlan;
+  }
+  if (device.devicePlans && device.devicePlans.length > 0) {
+    return PLAN_DISPLAY[device.devicePlans[0]] || device.devicePlans[0];
+  }
+  return '—';
+}
+
+// Column definitions for the vehicle table
+const VT_COLS = [
+  { id: 'name',         label: () => t('kpiVehicles'), sortable: true },
+  { id: 'plate',        label: () => 'Plate',          sortable: true },
+  { id: 'odometer',     label: () => 'Odometer (km)',  sortable: true, numeric: true },
+  { id: 'lastConnect',  label: () => 'Last Connect',   sortable: true, numeric: true },
+  { id: 'firstConnect', label: () => 'First Connect',  sortable: true, numeric: true },
+  { id: 'plan',         label: () => 'Plan',           sortable: true, filterable: true },
+  { id: 'vin',          label: () => 'VIN',            sortable: false },
+  { id: 'serial',       label: () => 'Serial No.',     sortable: false },
+  { id: 'comment',      label: () => 'Comment',        sortable: false },
+];
+
+function getDeviceRow(d, statusMap) {
+  const st = statusMap.get(d.id);
+  const odomRec = state.odometerMap && state.odometerMap.get(d.id);
+  let odoKm = null;
+  if (odomRec && odomRec.data != null && odomRec.data > 0) odoKm = Math.round(odomRec.data / 1000);
+  else if (st && st.odometer != null && st.odometer > 0) odoKm = Math.round(st.odometer / 1000);
+
+  const lastConnectDate = st ? st.dateTime : null;
+  const lastConnectMs   = lastConnectDate ? Date.now() - new Date(lastConnectDate).getTime() : Infinity;
+  const firstConnectDate = d.activeFrom || null;
+  const firstConnectMs   = firstConnectDate ? Date.now() - new Date(firstConnectDate).getTime() : Infinity;
+
+  return {
+    device: d,
+    name: (d.name || d.id).toLowerCase(),
+    plate: (d.licensePlate || '').toLowerCase(),
+    odometer: odoKm,
+    lastConnect: lastConnectMs,
+    firstConnect: firstConnectMs,
+    plan: getPlanLabel(d),
+    vin: d.vehicleIdentificationNumber || '',
+    serial: d.serialNumber || '',
+    comment: d.comment || '',
+    lastConnectDate,
+    firstConnectDate,
+    // display values
+    odoDisplay: odoKm != null ? odoKm.toLocaleString() : '—',
+    lastConnectDisplay: formatConnectDate(lastConnectDate),
+    firstConnectDisplay: formatConnectDate(firstConnectDate),
+  };
+}
+
+// =============================================================
+// SEARCH QUERY PARSER
+// Syntax: [col][op][value] AND/OR [col][op][value] ...
+// ops: = ~ != < > <= >=
+// date cols: value in days; odometer: km; text: substring
+// plain text (no col): searches name, plate, vin, serial, comment
+// =============================================================
+const SEARCH_COL_ALIASES = {
+  name: 'name', vehicle: 'name', unit: 'name',
+  plate: 'plate', license: 'plate',
+  plan: 'plan',
+  odo: 'odometer', odometer: 'odometer', km: 'odometer',
+  last: 'lastConnect', lastconnect: 'lastConnect',
+  first: 'firstConnect', firstconnect: 'firstConnect',
+  vin: 'vin', serial: 'serial', comment: 'comment',
+};
+const SEARCH_TEXT_COLS = new Set(['name', 'plate', 'plan', 'vin', 'serial', 'comment']);
+const SEARCH_NUM_COLS  = new Set(['odometer', 'lastConnect', 'firstConnect']);
+
+function parseSearchQuery(text) {
+  if (!text || !text.trim()) return [];
+  // Split on AND / OR tokens while keeping the operator
+  const tokens = text.trim().split(/\s+(AND|OR)\s+/i);
+  const clauses = [];
+  let pendingLogic = 'AND';
+  for (const token of tokens) {
+    const upper = token.toUpperCase();
+    if (upper === 'AND' || upper === 'OR') { pendingLogic = upper; continue; }
+    const m = token.match(/^(\w+)\s*(<=|>=|!=|=|~|<|>)\s*(.+)$/i);
+    if (m) {
+      const col = SEARCH_COL_ALIASES[m[1].toLowerCase()];
+      if (col) {
+        clauses.push({ logic: pendingLogic, col, op: m[2], value: m[3].trim() });
+        pendingLogic = 'AND';
+        continue;
+      }
+    }
+    // No recognised column → plain text across text fields
+    clauses.push({ logic: pendingLogic, col: null, op: '~', value: token.trim() });
+    pendingLogic = 'AND';
+  }
+  return clauses;
+}
+
+function evalClause(row, { col, op, value }) {
+  if (!col) {
+    const v = value.toLowerCase();
+    return ['name', 'plate', 'vin', 'serial', 'comment'].some((c) =>
+      (row[c] || '').toLowerCase().includes(v));
+  }
+  if (SEARCH_TEXT_COLS.has(col)) {
+    const rv = (row[col] || '').toLowerCase();
+    const v  = value.toLowerCase();
+    if (op === '=' || op === '~') return rv.includes(v);
+    if (op === '!=')              return !rv.includes(v);
+    return true;
+  }
+  if (SEARCH_NUM_COLS.has(col)) {
+    const num = parseFloat(value);
+    if (!isFinite(num)) return true;
+    if (col === 'lastConnect' || col === 'firstConnect') {
+      if (!isFinite(row[col])) return false; // never connected
+      const days = row[col] / 86400000;
+      if (op === '=' || op === '~') return Math.abs(days - num) < 1;
+      if (op === '!=') return Math.abs(days - num) >= 1;
+      if (op === '<')  return days < num;
+      if (op === '>')  return days > num;
+      if (op === '<=') return days <= num;
+      if (op === '>=') return days >= num;
+    } else {
+      const rv = row[col];
+      if (rv == null) return false;
+      if (op === '=' || op === '~') return rv === num;
+      if (op === '!=') return rv !== num;
+      if (op === '<')  return rv < num;
+      if (op === '>')  return rv > num;
+      if (op === '<=') return rv <= num;
+      if (op === '>=') return rv >= num;
+    }
+  }
+  return true;
+}
+
+function applySearchFilter(rows, clauses) {
+  if (!clauses.length) return rows;
+  return rows.filter((row) => {
+    let result = evalClause(row, clauses[0]);
+    for (let i = 1; i < clauses.length; i++) {
+      const clauseResult = evalClause(row, clauses[i]);
+      result = clauses[i].logic === 'OR' ? result || clauseResult : result && clauseResult;
+    }
+    return result;
+  });
+}
+
+// Returns column config, initialising from VT_COLS defaults if not yet set
+function getColumnConfig() {
+  if (!state.columnConfig) {
+    state.columnConfig = VT_COLS.map((c) => ({ id: c.id, visible: true }));
+  }
+  return state.columnConfig;
+}
+
+// Render a single <td> for a given column id
+function renderCell(colId, r, d, groups, planCell, groupMap) {
+  switch (colId) {
+    case 'name': {
+      const namePart = `<div class="vt-name">${escapeHtml(d.name || d.id)}</div>`;
+      let subPart = '';
+      if (state.editMode && groupMap) {
+        const tags = (d.groups || []).map((g) => {
+          const gname = groupMap.get(g.id) || g.id;
+          const isPending = state.pendingChanges.some(
+            (c) => c.type === 'remove' && c.deviceId === d.id && c.groupId === g.id
+          );
+          return `<span class="vt-group-badge${isPending ? ' vt-group-badge--remove' : ''}"
+            data-device-id="${escapeHtml(d.id)}"
+            data-device-name="${escapeHtml(d.name || d.id)}"
+            data-group-id="${escapeHtml(g.id)}"
+            data-group-name="${escapeHtml(gname)}"
+            title="${isPending ? 'Click to undo' : 'Click to stage removal'}">${escapeHtml(gname)}</span>`;
+        }).join('');
+        if (tags) subPart = `<div class="vt-group-badges">${tags}</div>`;
+      } else if (groups) {
+        subPart = `<div class="vt-sub">${escapeHtml(groups)}</div>`;
+      }
+      return `<td>${namePart}${subPart}</td>`;
+    }
+    case 'plate':
+      return `<td>${escapeHtml(d.licensePlate || '')}</td>`;
+    case 'odometer':
+      return `<td class="vt-num">${r.odoDisplay}</td>`;
+    case 'lastConnect':
+      return `<td class="vt-num vt-filterable" data-filter-col="lastConnect" data-filter-ms="${r.lastConnect}" data-filter-display="${escapeHtml(r.lastConnectDisplay)}">${r.lastConnectDisplay}</td>`;
+    case 'firstConnect':
+      return `<td class="vt-num vt-filterable" data-filter-col="firstConnect" data-filter-ms="${r.firstConnect}" data-filter-display="${escapeHtml(r.firstConnectDisplay)}">${r.firstConnectDisplay}</td>`;
+    case 'plan':
+      return planCell;
+    case 'vin':
+      return `<td class="vt-mono">${escapeHtml(d.vehicleIdentificationNumber || '')}</td>`;
+    case 'serial':
+      return `<td class="vt-mono">${escapeHtml(d.serialNumber || '')}</td>`;
+    case 'comment':
+      return `<td>${escapeHtml(d.comment || '')}</td>`;
+    default:
+      return '<td></td>';
+  }
+}
+
+function openColumnConfigPanel(anchorBtn) {
+  document.getElementById('colConfigPanel')?.remove();
+  const cfg = getColumnConfig();
+
+  const items = cfg.map((c, i) => {
+    const col = VT_COLS.find((x) => x.id === c.id);
+    return `<li class="col-config-item" draggable="true" data-idx="${i}" data-col="${c.id}">
+      <span class="col-drag-handle" title="Drag to reorder">⠿</span>
+      <input type="checkbox" id="colchk_${c.id}"${c.visible ? ' checked' : ''} data-col="${c.id}">
+      <label for="colchk_${c.id}">${col ? col.label() : c.id}</label>
+    </li>`;
+  }).join('');
+
+  const panel = document.createElement('div');
+  panel.id = 'colConfigPanel';
+  panel.className = 'col-config-panel';
+  panel.innerHTML = `
+    <div class="col-config-header">
+      <span>Columns</span>
+      <button class="col-config-close" title="Close">✕</button>
+    </div>
+    <ul class="col-config-list">${items}</ul>
+    <div class="col-config-footer">
+      <button class="fo-btn fo-btn--ghost fo-btn--sm" id="colConfigReset">Reset</button>
+    </div>`;
+
+  document.body.appendChild(panel);
+
+  // Position below the anchor, right-aligned
+  const rect = anchorBtn.getBoundingClientRect();
+  panel.style.top   = (rect.bottom + window.scrollY + 4) + 'px';
+  panel.style.right = (window.innerWidth - rect.right + window.scrollX) + 'px';
+
+  // Drag-and-drop reorder
+  let dragIdx = null;
+  panel.querySelectorAll('.col-config-item').forEach((item) => {
+    item.addEventListener('dragstart', (e) => {
+      dragIdx = parseInt(item.dataset.idx);
+      e.dataTransfer.effectAllowed = 'move';
+      item.classList.add('col-config-item--dragging');
+    });
+    item.addEventListener('dragend', () => item.classList.remove('col-config-item--dragging'));
+    item.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    item.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const dropIdx = parseInt(item.dataset.idx);
+      if (dragIdx === null || dragIdx === dropIdx) return;
+      const newCfg = [...state.columnConfig];
+      const [moved] = newCfg.splice(dragIdx, 1);
+      newCfg.splice(dropIdx, 0, moved);
+      state.columnConfig = newCfg;
+      refreshVehicleTable();
+      openColumnConfigPanel(anchorBtn); // re-render panel with new order
+    });
+  });
+
+  // Checkbox visibility toggle
+  panel.querySelectorAll('input[type="checkbox"][data-col]').forEach((chk) => {
+    chk.addEventListener('change', () => {
+      const entry = state.columnConfig.find((c) => c.id === chk.dataset.col);
+      if (entry) { entry.visible = chk.checked; refreshVehicleTable(); }
+    });
+  });
+
+  // Reset to defaults
+  panel.querySelector('#colConfigReset').addEventListener('click', () => {
+    state.columnConfig = VT_COLS.map((c) => ({ id: c.id, visible: true }));
+    refreshVehicleTable();
+    openColumnConfigPanel(anchorBtn);
+  });
+
+  // Close button
+  panel.querySelector('.col-config-close').addEventListener('click', () => panel.remove());
+
+  // Close on outside click (defer one tick so this click doesn't immediately close)
+  setTimeout(() => {
+    const handler = (e) => {
+      if (!panel.contains(e.target) && e.target !== anchorBtn) {
+        panel.remove();
+        document.removeEventListener('click', handler);
+      }
+    };
+    document.addEventListener('click', handler);
+  }, 0);
+}
+
+function renderVehicleTable(container, devices, selectedSet, filterText) {
+  const statusMap = new Map(state.deviceStatuses.map((s) => [s.device && s.device.id, s]));
+
+  // Build enriched rows, apply search query and column filters
+  let rows = devices.map((d) => getDeviceRow(d, statusMap));
+  rows = applySearchFilter(rows, parseSearchQuery(filterText));
+  if (state.columnFilters.plan) rows = rows.filter((r) => r.plan === state.columnFilters.plan);
+  for (const col of ['lastConnect', 'firstConnect']) {
+    const f = state.columnFilters[col];
+    if (f) rows = rows.filter((r) => f.mode === 'lte' ? r[col] <= f.ms : r[col] >= f.ms);
+  }
+
+  // Sort
+  const { column, direction } = state.tableSort;
+  if (column) {
+    const col = VT_COLS.find((c) => c.id === column);
+    const mul = direction === 'asc' ? 1 : -1;
+    rows.sort((a, b) => {
+      const av = a[column], bv = b[column];
+      if (av == null && bv == null) return 0;
+      if (av == null) return mul;
+      if (bv == null) return -mul;
+      if (col && col.numeric) return (av - bv) * mul;
+      return String(av).localeCompare(String(bv)) * mul;
+    });
+  } else {
+    rows.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  vehicleDisplayCount = rows.length;
+  refreshVehicleCountBadge();
+
+  if (rows.length === 0) {
+    container.innerHTML = '<div class="fo-empty">No vehicles found.</div>';
     return;
   }
 
-  const parentId = parentGroupSelect.value;
-  const entity   = { name };
-  if (parentId) {
-    entity.parent = { id: parentId };
+  const groupMap = new Map(state.groups.map((g) => [g.id, g.name || g.id]));
+  const showCb   = selectedSet != null;
+
+  // Build header with sort indicators
+  const sortIcon = (id) => {
+    if (state.tableSort.column !== id) return '<span class="vt-sort-icon">⇅</span>';
+    return state.tableSort.direction === 'asc'
+      ? '<span class="vt-sort-icon vt-sort-icon--active">▲</span>'
+      : '<span class="vt-sort-icon vt-sort-icon--active">▼</span>';
+  };
+  const filterBadge = (colId) => {
+    const f = state.columnFilters[colId];
+    if (!f) return '';
+    const sym = f.mode === 'lte' ? '≤' : '≥';
+    return ` <span class="vt-filter-active" data-clear-filter="${colId}" title="Clear filter">${sym}${f.display} ✕</span>`;
+  };
+
+  const visibleCols = getColumnConfig()
+    .filter((c) => c.visible)
+    .map((c) => VT_COLS.find((x) => x.id === c.id))
+    .filter(Boolean);
+
+  const allChecked = showCb && rows.length > 0 && rows.every((r) => selectedSet.has(r.device.id));
+  const cbHead = showCb
+    ? `<th class="vt-cb-col"><input type="checkbox" id="vtSelectAll"${allChecked ? ' checked' : ''} title="Select all"></th>`
+    : '';
+  const thCells = visibleCols.map((col) => {
+    const sort = col.sortable ? ` data-sort="${col.id}"` : '';
+    const cls  = col.sortable ? ' class="vt-th-sortable"' : '';
+    let extra = '';
+    if (col.id === 'plan') extra = filterBadge('plan');
+    if (col.id === 'lastConnect')  extra = filterBadge('lastConnect');
+    if (col.id === 'firstConnect') extra = filterBadge('firstConnect');
+    return `<th${cls}${sort}>${col.label()}${col.sortable ? sortIcon(col.id) : ''}${extra}</th>`;
+  }).join('');
+  const thead = `<thead><tr>${cbHead}${thCells}</tr></thead>`;
+
+  // Build rows
+  const tbodyRows = rows.map((r) => {
+    const d = r.device;
+    const groups = (d.groups || []).map((g) => groupMap.get(g.id)).filter(Boolean).join(', ');
+    const cbCell = showCb
+      ? `<td class="vt-cb-col"><input type="checkbox" data-id="${escapeHtml(d.id)}"${selectedSet.has(d.id) ? ' checked' : ''}></td>`
+      : '';
+    const planCell = state.columnFilters.plan === r.plan
+      ? `<td><span class="vt-plan-filtered">${escapeHtml(r.plan)}</span></td>`
+      : `<td class="vt-filterable" data-filter-col="plan" data-filter-val="${escapeHtml(r.plan)}">${escapeHtml(r.plan)}</td>`;
+    const tdCells = visibleCols.map((col) => renderCell(col.id, r, d, groups, planCell, groupMap)).join('');
+    return `<tr>${cbCell}${tdCells}</tr>`;
+  }).join('');
+
+  container.innerHTML = `<table class="fo-vehicle-table">${thead}<tbody>${tbodyRows}</tbody></table>`;
+
+  // Sort click handlers
+  container.querySelectorAll('[data-sort]').forEach((th) => {
+    th.addEventListener('click', (e) => {
+      if (e.target.closest('[data-clear-filter]')) return; // handled below
+      const col = th.dataset.sort;
+      if (state.tableSort.column === col) {
+        state.tableSort.direction = state.tableSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.tableSort = { column: col, direction: 'asc' };
+      }
+      refreshVehicleTable();
+    });
+  });
+
+  // Column filter: clicking a cell value sets a filter
+  container.querySelectorAll('[data-filter-col]').forEach((td) => {
+    td.addEventListener('click', () => {
+      const col = td.dataset.filterCol;
+      if (col === 'plan') {
+        const val = td.dataset.filterVal;
+        state.columnFilters.plan = state.columnFilters.plan === val ? null : val;
+      } else if (col === 'lastConnect' || col === 'firstConnect') {
+        const ms = parseFloat(td.dataset.filterMs);
+        if (!isFinite(ms)) return;
+        const display = td.dataset.filterDisplay;
+        const existing = state.columnFilters[col];
+        // Toggle off if clicking the same value
+        if (existing && existing.ms === ms) { state.columnFilters[col] = null; }
+        else {
+          // Mode: if this column is sorted ascending (newest first = small ms), user clicked
+          // something near the bottom → show ≥ (older); if sorted descending → show ≤ (newer).
+          // If not sorted by this col, default to ≤ (show this recent and newer).
+          const isSortedAsc  = state.tableSort.column === col && state.tableSort.direction === 'asc';
+          const mode = isSortedAsc ? 'gte' : 'lte';
+          state.columnFilters[col] = { ms, mode, display };
+        }
+      }
+      refreshVehicleTable();
+    });
+  });
+
+  // Clear filter ✕ button
+  container.querySelectorAll('[data-clear-filter]').forEach((span) => {
+    span.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.columnFilters[span.dataset.clearFilter] = null;
+      refreshVehicleTable();
+    });
+  });
+
+  // Checkbox handlers (row checkboxes + select-all header)
+  if (showCb) {
+    const selectAllChk = container.querySelector('#vtSelectAll');
+    if (selectAllChk) {
+      selectAllChk.addEventListener('change', () => {
+        if (selectAllChk.checked) rows.forEach((r) => selectedSet.add(r.device.id));
+        else                       rows.forEach((r) => selectedSet.delete(r.device.id));
+        refreshVehicleTable();
+      });
+    }
+    container.querySelectorAll('input[type="checkbox"][data-id]').forEach((cb) => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) selectedSet.add(cb.dataset.id);
+        else            selectedSet.delete(cb.dataset.id);
+        refreshVehicleCountBadge();
+      });
+    });
   }
 
-  createGroupBtn.disabled = true;
-  setOpStatus(createGroupStatus, t('statusLoading'));
+  // Group badge clicks (edit mode removal staging)
+  if (state.editMode) {
+    container.querySelectorAll('.vt-group-badge').forEach((badge) => {
+      // Single-click: toggle removal for this device only
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const { deviceId, deviceName, groupId, groupName } = badge.dataset;
+        const idx = state.pendingChanges.findIndex(
+          (c) => c.type === 'remove' && c.deviceId === deviceId && c.groupId === groupId
+        );
+        if (idx >= 0) state.pendingChanges.splice(idx, 1);
+        else state.pendingChanges.push({ type: 'remove', deviceId, deviceName, groupId, groupName });
+        renderPendingSummary();
+        refreshVehicleTable();
+      });
 
-  state.api.call(
-    'Add',
-    { typeName: 'Group', entity },
-    function() {
-      createGroupBtn.disabled = false;
-      newGroupName.value = '';
-      setOpStatus(createGroupStatus, t('msgGroupCreated'));
-      loadAllData(); // refresh all data so the new group appears in the tree
-    },
-    function(err) {
-      createGroupBtn.disabled = false;
-      setOpStatus(createGroupStatus, err && err.message ? err.message : String(err), true);
-    }
-  );
+      // Double-click: bulk-toggle removal for ALL listed devices that have this group
+      badge.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        const { groupId, groupName } = badge.dataset;
+        // Collect all badges for this group currently in the table
+        const allBadges = [...container.querySelectorAll(`.vt-group-badge[data-group-id="${CSS.escape(groupId)}"]`)];
+        const allPending = allBadges.every((b) =>
+          state.pendingChanges.some((c) => c.type === 'remove' && c.deviceId === b.dataset.deviceId && c.groupId === groupId)
+        );
+        if (allPending) {
+          // All already marked — unmark all
+          state.pendingChanges = state.pendingChanges.filter(
+            (c) => !(c.type === 'remove' && c.groupId === groupId)
+          );
+        } else {
+          // Mark any not yet staged
+          allBadges.forEach((b) => {
+            const already = state.pendingChanges.some(
+              (c) => c.type === 'remove' && c.deviceId === b.dataset.deviceId && c.groupId === groupId
+            );
+            if (!already) {
+              state.pendingChanges.push({
+                type: 'remove',
+                deviceId: b.dataset.deviceId,
+                deviceName: b.dataset.deviceName,
+                groupId,
+                groupName,
+              });
+            }
+          });
+        }
+        renderPendingSummary();
+        refreshVehicleTable();
+      });
+    });
+  }
+}
+
+function downloadCsv() {
+  const statusMap = new Map(state.deviceStatuses.map((s) => [s.device && s.device.id, s]));
+  const groupMap  = new Map(state.groups.map((g) => [g.id, g.name || g.id]));
+
+  // Get the same filtered+sorted rows as the current table
+  let rows = state.devices.map((d) => getDeviceRow(d, statusMap));
+  rows = applySearchFilter(rows, parseSearchQuery(state.vehicleFilterText));
+  if (state.columnFilters.plan) rows = rows.filter((r) => r.plan === state.columnFilters.plan);
+  if (state.selectedGroupId) {
+    const gid = state.selectedGroupId;
+    rows = rows.filter((r) => (r.device.groups || []).some((g) => g.id === gid));
+  }
+
+  const headers = ['Name', 'Groups', 'Plate', 'Odometer (km)', 'Last Connect', 'First Connect', 'Plan', 'VIN', 'Serial No.', 'Comment'];
+  const csvRows = [headers.join(',')];
+  for (const r of rows) {
+    const d = r.device;
+    const groups = (d.groups || []).map((g) => groupMap.get(g.id)).filter(Boolean).join('; ');
+    const esc = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+    csvRows.push([d.name, groups, d.licensePlate, r.odoDisplay === '—' ? '' : r.odoDisplay,
+      r.lastConnectDisplay, r.firstConnectDisplay, r.plan, d.vehicleIdentificationNumber,
+      d.serialNumber, d.comment].map(esc).join(','));
+  }
+
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: 'fleet-vehicles.csv' });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 /**
@@ -608,107 +1606,6 @@ function batchedMultiCall(calls) {
   return runChunk(0);
 }
 
-function bulkAssignVehicles() {
-  const targetGroupId = assignTargetGroup.value;
-  if (!targetGroupId) {
-    setOpStatus(bulkAssignStatus, t('errorNoGroup'), true);
-    return;
-  }
-  if (state.adminSelectedVehicles.size === 0) {
-    setOpStatus(bulkAssignStatus, t('errorNoVehicles'), true);
-    return;
-  }
-
-  const selectedIds = Array.from(state.adminSelectedVehicles);
-  const deviceMap   = new Map(state.devices.map((d) => [d.id, d]));
-
-  const calls = selectedIds.map((id) => {
-    const device = deviceMap.get(id);
-    if (!device) return null;
-
-    // Merge: add the target group if not already present
-    const existingGroups = (device.groups || []).map((g) => ({ id: g.id }));
-    const alreadyIn      = existingGroups.some((g) => g.id === targetGroupId);
-    const newGroups      = alreadyIn
-      ? existingGroups
-      : [...existingGroups, { id: targetGroupId }];
-
-    return ['Set', { typeName: 'Device', entity: { ...device, groups: newGroups } }];
-  }).filter(Boolean);
-
-  assignVehiclesBtn.disabled = true;
-  setOpStatus(bulkAssignStatus, t('statusLoading'));
-
-  batchedMultiCall(calls).then(() => {
-    assignVehiclesBtn.disabled = false;
-    const msg = STRINGS[state.lang].msgAssigned(selectedIds.length);
-    setOpStatus(bulkAssignStatus, msg);
-    state.adminSelectedVehicles.clear();
-    loadAllData();
-  }).catch((err) => {
-    assignVehiclesBtn.disabled = false;
-    setOpStatus(bulkAssignStatus, err && err.message ? err.message : String(err), true);
-  });
-}
-
-function loadGroupVehicles() {
-  const sourceGroupId = removeSourceGroup.value;
-  if (!sourceGroupId) {
-    setOpStatus(removeVehiclesStatus, t('errorNoGroup'), true);
-    return;
-  }
-
-  // Filter devices that belong to this group
-  const groupDevices = state.devices.filter((d) =>
-    (d.groups || []).some((g) => g.id === sourceGroupId)
-  );
-
-  state.adminRemoveSelected.clear();
-  renderVehicleChecklist(removeVehicleChecklist, groupDevices, state.adminRemoveSelected);
-
-  const msg = STRINGS[state.lang].msgLoadVehicles(groupDevices.length);
-  setOpStatus(removeVehiclesStatus, msg);
-}
-
-function removeVehicles() {
-  const sourceGroupId = removeSourceGroup.value;
-  if (!sourceGroupId || state.adminRemoveSelected.size === 0) {
-    setOpStatus(removeVehiclesStatus, t('errorNoSourceGroup'), true);
-    return;
-  }
-
-  if (!window.confirm(t('confirmRemove'))) return;
-
-  const selectedIds = Array.from(state.adminRemoveSelected);
-  const deviceMap   = new Map(state.devices.map((d) => [d.id, d]));
-
-  const calls = selectedIds.map((id) => {
-    const device = deviceMap.get(id);
-    if (!device) return null;
-
-    // Filter out the source group from the device's groups
-    const newGroups = (device.groups || [])
-      .filter((g) => g.id !== sourceGroupId)
-      .map((g) => ({ id: g.id }));
-
-    return ['Set', { typeName: 'Device', entity: { ...device, groups: newGroups } }];
-  }).filter(Boolean);
-
-  removeVehiclesBtn.disabled = true;
-  setOpStatus(removeVehiclesStatus, t('statusLoading'));
-
-  batchedMultiCall(calls).then(() => {
-    removeVehiclesBtn.disabled = false;
-    const msg = STRINGS[state.lang].msgRemoved(selectedIds.length);
-    setOpStatus(removeVehiclesStatus, msg);
-    state.adminRemoveSelected.clear();
-    removeVehicleChecklist.innerHTML = '';
-    loadAllData();
-  }).catch((err) => {
-    removeVehiclesBtn.disabled = false;
-    setOpStatus(removeVehiclesStatus, err && err.message ? err.message : String(err), true);
-  });
-}
 
 // =============================================================
 // 10. i18n — Apply language and update all text nodes
@@ -716,26 +1613,16 @@ function removeVehicles() {
 
 // Static map of elementId → string key for text that can be set via textContent
 const TEXT_MAP = {
-  title:                'title',
-  langToggleBtn:        'langToggle',
-  kpiVehiclesLabel:     'kpiVehicles',
-  kpiGroupsLabel:       'kpiGroups',
-  kpiUsersLabel:        'kpiUsers',
-  treePanelTitle:       'treePanelTitle',
-  donutPanelTitle:      'donutPanelTitle',
-  adminCreateTitle:     'adminCreateTitle',
-  adminGroupNameLabel:  'adminGroupNameLabel',
-  adminParentLabel:     'adminParentLabel',
-  createGroupBtn:       'createGroupBtn',
-  adminAssignTitle:     'adminAssignTitle',
-  adminTargetGroupLabel:'adminTargetGroupLabel',
-  selectAllVehiclesBtn: 'selectAllVehiclesBtn',
-  assignVehiclesBtn:    'assignVehiclesBtn',
-  adminRemoveTitle:     'adminRemoveTitle',
-  adminSourceGroupLabel:'adminSourceGroupLabel',
-  loadGroupVehiclesBtn: 'loadGroupVehiclesBtn',
-  removeVehiclesBtn:    'removeVehiclesBtn',
-  loadingText:          'loadingText',
+  title:                    'title',
+  langToggleBtn:            'langToggle',
+  kpiVehiclesLabel:         'kpiVehicles',
+  kpiGroupsLabel:           'kpiGroups',
+  kpiLicensesLabel:         'kpiLicenses',
+  treePanelTitle:           'treePanelTitle',
+  loadingText:              'loadingText',
+  hideEmptyGroupsLabel:     'hideEmptyGroupsLabel',
+  showSystemGroupsLabel:    'showSystemGroupsLabel',
+  showArchivedDevicesLabel: 'showArchivedDevicesLabel',
 };
 
 // Keys that are placeholder attributes
@@ -765,27 +1652,15 @@ function applyLang(lang) {
     if (el) el.placeholder = t(strKey);
   }
 
-  // Update admin panel title (has SVG child)
-  if (adminPanelTitle) {
-    const svg = adminPanelTitle.querySelector('svg');
-    adminPanelTitle.textContent = t('adminPanelTitle');
-    if (svg) adminPanelTitle.prepend(svg);
+  // Reset vehicle panel title when no group selected
+  if (!state.selectedGroupId) {
+    vehiclePanelTitle.textContent = t('allVehiclesTitle');
   }
 
-  // Refresh admin selects option labels
-  if (parentGroupSelect && parentGroupSelect.options[0]) {
-    parentGroupSelect.options[0].textContent = t('adminParentRoot');
-  }
-  if (assignTargetGroup && assignTargetGroup.options[0]) {
-    assignTargetGroup.options[0].textContent = t('adminTargetGroupPlaceholder');
-  }
-  if (removeSourceGroup && removeSourceGroup.options[0]) {
-    removeSourceGroup.options[0].textContent = t('adminSourceGroupPlaceholder');
-  }
-
-  // Re-render charts so labels update
-  if (state.groupTree) renderTreeChart();
-  if (state.deviceStatuses.length) renderDonutChart();
+  // Re-render charts and lists so labels update
+  if (state.groupTree) { renderTreeChart(); renderTreeView(); }
+  if (state.devicePlans) renderPlanPills();
+  refreshVehicleTable();
 }
 
 // =============================================================
@@ -797,33 +1672,278 @@ langToggleBtn.addEventListener('click', () => {
   applyLang(next);
 });
 
-createGroupBtn.addEventListener('click', createGroup);
-
-assignVehiclesBtn.addEventListener('click', bulkAssignVehicles);
-
-selectAllVehiclesBtn.addEventListener('click', () => {
-  const filterText = state.vehicleFilterText.toLowerCase();
-  const filtered = filterText
-    ? state.devices.filter((d) => (d.name || '').toLowerCase().includes(filterText))
-    : state.devices;
-
-  const allSelected = filtered.every((d) => state.adminSelectedVehicles.has(d.id));
-  if (allSelected) {
-    filtered.forEach((d) => state.adminSelectedVehicles.delete(d.id));
-  } else {
-    filtered.forEach((d) => state.adminSelectedVehicles.add(d.id));
-  }
-  renderVehicleChecklist(vehicleChecklist, state.devices, state.adminSelectedVehicles);
-});
-
 vehicleSearchInput.addEventListener('input', () => {
   state.vehicleFilterText = vehicleSearchInput.value;
-  renderVehicleChecklist(vehicleChecklist, state.devices, state.adminSelectedVehicles);
+  refreshVehicleTable();
 });
 
-loadGroupVehiclesBtn.addEventListener('click', loadGroupVehicles);
+document.getElementById('btnDownloadCsv').addEventListener('click', downloadCsv);
+document.getElementById('btnColumnConfig').addEventListener('click', function () { openColumnConfigPanel(this); });
 
-removeVehiclesBtn.addEventListener('click', removeVehicles);
+document.getElementById('showRelativeDatesChk').addEventListener('change', (e) => {
+  state.showRelativeDates = e.target.checked;
+  refreshVehicleTable();
+});
+
+// ---- Edit mode ----
+document.getElementById('btnEditMode').addEventListener('click', () => {
+  if (!state.editMode) {
+    setEditMode(true);
+  } else if (state.pendingChanges.length === 0) {
+    setEditMode(false);
+  } else {
+    openConfirmModal();
+  }
+});
+
+// Edit group search autocomplete
+document.getElementById('editGroupSearch').addEventListener('input', () => {
+  const q   = document.getElementById('editGroupSearch').value.toLowerCase();
+  const list = document.getElementById('editGroupList');
+  if (!q) { list.innerHTML = ''; list.hidden = true; return; }
+  const matches = state.groups
+    .filter((g) => (g.name || '').toLowerCase().includes(q))
+    .slice(0, 20);
+  if (!matches.length) { list.innerHTML = ''; list.hidden = true; return; }
+  list.innerHTML = matches.map((g) =>
+    `<li data-id="${escapeHtml(g.id)}" data-name="${escapeHtml(g.name || g.id)}">${escapeHtml(g.name || g.id)}</li>`
+  ).join('');
+  list.hidden = false;
+});
+
+document.getElementById('editGroupList').addEventListener('click', (e) => {
+  const li = e.target.closest('li[data-id]');
+  if (!li) return;
+  state.editGroupId   = li.dataset.id;
+  state.editGroupName = li.dataset.name;
+  document.getElementById('editGroupSearch').value = li.dataset.name;
+  document.getElementById('editGroupList').hidden = true;
+});
+
+document.addEventListener('click', (e) => {
+  const list   = document.getElementById('editGroupList');
+  const search = document.getElementById('editGroupSearch');
+  if (list && search && !search.contains(e.target) && !list.contains(e.target)) {
+    list.hidden = true;
+  }
+});
+
+
+// Stage Add
+document.getElementById('editStageAddBtn').addEventListener('click', () => {
+  const status = document.getElementById('editAddStatus');
+  const ids    = [...state.editSelectedDevices];
+  if (!ids.length)           { setOpStatus(status, 'No devices checked.', true); return; }
+  if (!state.editGroupId)    { setOpStatus(status, 'No group selected.', true); return; }
+
+  const existing = state.pendingChanges.find(
+    (c) => c.type === 'add' && c.groupId === state.editGroupId
+  );
+  if (existing) {
+    ids.forEach((id) => existing.deviceIds.add(id));
+  } else {
+    state.pendingChanges.push({
+      type: 'add', groupId: state.editGroupId, groupName: state.editGroupName, deviceIds: new Set(ids),
+    });
+  }
+  renderPendingSummary();
+  setOpStatus(status, `Staged: ${ids.length} device(s) → "${state.editGroupName}"`);
+});
+
+// Stage Create group
+document.getElementById('editStageCreateBtn').addEventListener('click', () => {
+  const nameEl = document.getElementById('editNewGroupName');
+  const status = document.getElementById('editCreateStatus');
+  const name   = nameEl.value.trim();
+  if (!name) { setOpStatus(status, 'Enter a group name.', true); return; }
+
+  // Temporary ID — replaced with the real Geotab ID on apply
+  const tempId = `_pending_${Date.now()}`;
+  state.pendingChanges.push({
+    type: 'createGroup', name, tempId,
+    parentId:   state.editGroupId   || 'GroupCompanyId',
+    parentName: state.editGroupName || 'Root',
+  });
+
+  // Add immediately to state.groups so it appears in the autocomplete
+  // and can be used as target for Add operations in the same edit session
+  state.groups.push({ id: tempId, name, children: [], parent: { id: state.editGroupId || 'GroupCompanyId' }, _pending: true });
+
+  nameEl.value = '';
+  renderPendingSummary();
+  setOpStatus(status, `"${name}" staged — now available in group search`);
+});
+
+// Clear all staged + exit edit mode
+document.getElementById('editClearAllBtn').addEventListener('click', () => {
+  // Remove any temp groups that were added to state for immediate staging
+  state.groups = state.groups.filter((g) => !g._pending);
+  state.groupTree = buildGroupTree(state.groups, state.devices, state.users, state.showSystemGroups);
+  state.pendingChanges = [];
+  setEditMode(false);
+});
+
+// Confirmation modal
+document.getElementById('confirmApply').addEventListener('click', applyPendingChanges);
+document.getElementById('confirmCancel').addEventListener('click', () => {
+  document.getElementById('confirmModal').hidden = true;
+});
+document.getElementById('confirmClose').addEventListener('click', () => {
+  document.getElementById('confirmModal').hidden = true;
+});
+
+// View toggle
+const VIEW_BTNS = ['TreeView', 'MindmapView'];
+function switchView(activeView) {
+  VIEW_BTNS.forEach((v) => {
+    const container = document.getElementById(v.charAt(0).toLowerCase() + v.slice(1) + 'Container');
+    const btn = document.getElementById('btn' + v);
+    if (!container || !btn) return;
+    if (v === activeView) {
+      container.removeAttribute('hidden');
+      btn.classList.add('fo-view-btn--active');
+    } else {
+      container.setAttribute('hidden', '');
+      btn.classList.remove('fo-view-btn--active');
+    }
+  });
+}
+
+document.getElementById('hideEmptyGroupsChk').addEventListener('change', (e) => {
+  state.hideEmptyGroups = e.target.checked;
+  if (state.groupTree) { renderTreeChart(); renderTreeView(); }
+});
+
+document.getElementById('showSystemGroupsChk').addEventListener('change', (e) => {
+  state.showSystemGroups = e.target.checked;
+  if (state.groups) {
+    state.groupTree = buildGroupTree(state.groups, state.devices, state.users, state.showSystemGroups);
+    renderTreeChart(); renderTreeView();
+  }
+});
+
+document.getElementById('showArchivedDevicesChk').addEventListener('change', async (e) => {
+  state.showArchivedDevices = e.target.checked;
+  if (state.showArchivedDevices && !state.allDevices) {
+    // Lazy-load all devices (including archived) on first toggle
+    try {
+      const all = await apiCall('Get', { typeName: 'Device', resultsLimit: 50000 });
+      state.allDevices = all || [];
+    } catch (err) {
+      state.allDevices = [...state.activeDevices];
+    }
+  }
+  state.devices = state.showArchivedDevices ? (state.allDevices || state.activeDevices) : state.activeDevices;
+  state.groupTree = buildGroupTree(state.groups, state.devices, state.users, state.showSystemGroups);
+  renderTreeChart(); renderTreeView(); renderKpis(); refreshVehicleTable();
+});
+
+document.getElementById('btnTreeView').addEventListener('click', () => switchView('TreeView'));
+
+document.getElementById('btnMindmapView').addEventListener('click', () => {
+  switchView('MindmapView');
+  renderTreeView();
+});
+
+
+document.getElementById('btnHomeTree').addEventListener('click', () => {
+  state.selectedGroupId = null;
+  vehiclePanelTitle.textContent = t('allVehiclesTitle');
+  // Reset treemap to root view
+  if (treeChartInstance) {
+    try {
+      const root = treeChartInstance.getModel().getSeriesByIndex(0).getData().tree.root;
+      treeChartInstance.dispatchAction({ type: 'treemapRootToNode', seriesIndex: 0, targetNode: root });
+    } catch (e) { /* ignore */ }
+  }
+  // Reset mindmap selection
+  if (mindmapChartInstance) mindmapChartInstance.dispatchAction({ type: 'unfocusNodeAdjacency' });
+  refreshVehicleTable();
+});
+
+document.getElementById('btnExpandTree').addEventListener('click', toggleTreePanelExpand);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && state.treePanelExpanded) toggleTreePanelExpand();
+});
+
+// Treemap group search autocomplete
+(function () {
+  const searchInput = document.getElementById('treeGroupSearch');
+  const searchList  = document.getElementById('treeGroupList');
+  if (!searchInput || !searchList) return;
+
+  function showTreeSearchResults(text) {
+    const q = text.trim().toLowerCase();
+    searchList.innerHTML = '';
+    if (!q || !state.groups.length) { searchList.hidden = true; return; }
+    const matches = state.groups
+      .filter((g) => !g._pending && (g.name || g.id).toLowerCase().includes(q))
+      .slice(0, 12);
+    if (!matches.length) { searchList.hidden = true; return; }
+    matches.forEach((g) => {
+      const li = document.createElement('li');
+      li.textContent = g.name || g.id;
+      li.dataset.id  = g.id;
+      li.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        searchInput.value = '';
+        searchList.hidden = true;
+        selectGroup(g.id);
+        // Navigate treemap step-by-step through the ancestor path to the target node.
+        // ECharts treemap requires stepping through each level (direct jumps skip intermediate
+        // state and render empty for non-leaf nodes with children).
+        if (treeChartInstance && treeChartData) {
+          try {
+            const internalRoot = treeChartInstance.getModel().getSeriesByIndex(0).getData().tree.root;
+            const internalNode = findInternalTreeNode(treeChartData, internalRoot.children, g.id);
+            if (internalNode) {
+              // Build ancestor path from root down to target (excluding virtual root)
+              const path = [];
+              let cur = internalNode;
+              while (cur && cur.parentNode) { path.unshift(cur); cur = cur.parentNode; }
+              // Dispatch each step with a small delay so ECharts processes each transition
+              path.forEach((node, i) => {
+                setTimeout(() => {
+                  treeChartInstance.dispatchAction({ type: 'treemapRootToNode', seriesIndex: 0, targetNode: node });
+                }, i * 50);
+              });
+            }
+          } catch (e) { /* internal API unavailable, skip navigation */ }
+        }
+      });
+      searchList.appendChild(li);
+    });
+    searchList.hidden = false;
+  }
+
+  searchInput.addEventListener('input', () => showTreeSearchResults(searchInput.value));
+  searchInput.addEventListener('focus', () => showTreeSearchResults(searchInput.value));
+  searchInput.addEventListener('blur',  () => { setTimeout(() => { searchList.hidden = true; }, 150); });
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { searchInput.value = ''; searchList.hidden = true; }
+  });
+})();
+
+// Admin ops tabs
+['Create', 'Assign', 'Remove'].forEach((name) => {
+  const btn = document.getElementById('tabBtn' + name);
+  const pane = document.getElementById('pane' + name);
+  if (!btn || !pane) return;
+  btn.addEventListener('click', () => {
+    // Deactivate all tabs/panes
+    ['Create', 'Assign', 'Remove'].forEach((n) => {
+      const b = document.getElementById('tabBtn' + n);
+      const p = document.getElementById('pane' + n);
+      if (b) b.classList.remove('fo-tab--active');
+      if (p) p.setAttribute('hidden', '');
+    });
+    btn.classList.add('fo-tab--active');
+    pane.removeAttribute('hidden');
+    state.activeOpsTab = name.toLowerCase();
+    refreshVehicleTable();
+  });
+});
 
 // =============================================================
 // 12. Resize Handler
@@ -831,7 +1951,6 @@ removeVehiclesBtn.addEventListener('click', removeVehicles);
 
 window.addEventListener('resize', () => {
   if (treeChartInstance)  treeChartInstance.resize();
-  if (donutChartInstance) donutChartInstance.resize();
 });
 
 // =============================================================
@@ -855,9 +1974,11 @@ geotab.addin.FleetOrg = function () {
 
   function blur() {
     // Dispose all chart instances to prevent memory leaks
-    [treeChartInstance, donutChartInstance].forEach((c) => { if (c) c.dispose(); });
-    treeChartInstance  = null;
-    donutChartInstance = null;
+    [treeChartInstance, mindmapChartInstance].forEach((c) => {
+      if (c) c.dispose();
+    });
+    treeChartInstance    = null;
+    mindmapChartInstance = null;
   }
 
   return { initialize, focus, blur };

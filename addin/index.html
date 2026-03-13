@@ -11,10 +11,10 @@
 <body>
   <div class="fo-container">
 
-    <!-- ===== Header ===== -->
-    <header class="fo-header">
-      <h1 id="title">
-        <svg width="24" height="24" viewBox="0 0 128 128" aria-hidden="true">
+    <!-- Top Bar: header + KPIs in one compact row -->
+    <div class="fo-topbar">
+      <h1 class="fo-topbar-title" id="title">
+        <svg width="20" height="20" viewBox="0 0 128 128" aria-hidden="true">
           <rect width="128" height="128" rx="16" fill="#0f766e"/>
           <rect x="48" y="14" width="32" height="20" rx="4" fill="#fff" opacity="0.95"/>
           <line x1="64" y1="34" x2="64" y2="48" stroke="#fff" stroke-width="3" opacity="0.8"/>
@@ -28,106 +28,163 @@
         </svg>
         Fleet Org
       </h1>
-      <div class="fo-header-actions">
+
+      <div class="fo-topbar-kpis" aria-label="Key metrics">
+        <div class="fo-kpi-chip">
+          <span class="fo-kpi-chip-val" id="kpiVehiclesVal">—</span>
+          <span class="fo-kpi-chip-label" id="kpiVehiclesLabel">Vehicles</span>
+        </div>
+        <div class="fo-kpi-chip">
+          <span class="fo-kpi-chip-val" id="kpiGroupsVal">—</span>
+          <span class="fo-kpi-chip-label" id="kpiGroupsLabel">Groups</span>
+        </div>
+        <div class="fo-kpi-chip fo-kpi-chip--plans">
+          <span class="fo-kpi-chip-val" id="kpiLicensesVal">—</span>
+          <span class="fo-kpi-chip-label" id="kpiLicensesLabel">Active Devices</span>
+          <div class="fo-plan-pills" id="planPills"></div>
+        </div>
+      </div>
+
+      <div class="fo-topbar-actions">
         <span id="statusBadge">—</span>
         <button id="langToggleBtn" class="fo-btn fo-btn--ghost fo-btn--sm" type="button">ES</button>
       </div>
-    </header>
+    </div>
 
-    <!-- ===== KPI Row ===== -->
-    <section class="fo-kpi-row" aria-label="Key metrics">
-      <div class="fo-kpi-card">
-        <div class="fo-kpi-value" id="kpiVehiclesVal">—</div>
-        <div class="fo-kpi-label" id="kpiVehiclesLabel">Vehicles</div>
+    <!-- Group Hierarchy (full width, treemap/tree toggle) -->
+    <section class="fo-panel" aria-label="Group hierarchy">
+      <div class="fo-panel-title">
+        <span id="treePanelTitle">Group Hierarchy</span>
+        <div class="fo-autocomplete-wrap fo-tree-search-wrap">
+          <input class="fo-input fo-input--sm" type="search" id="treeGroupSearch" placeholder="Find group…" autocomplete="off">
+          <ul class="fo-autocomplete-list" id="treeGroupList"></ul>
+        </div>
+        <div class="fo-panel-title-controls">
+          <label class="fo-checkbox-label">
+            <input type="checkbox" id="hideEmptyGroupsChk">
+            <span id="hideEmptyGroupsLabel">Hide empty groups</span>
+          </label>
+          <label class="fo-checkbox-label">
+            <input type="checkbox" id="showSystemGroupsChk">
+            <span id="showSystemGroupsLabel">Show system groups</span>
+          </label>
+          <div class="fo-view-toggle">
+            <button class="fo-view-btn fo-view-btn--active" id="btnTreeView">Treemap</button>
+            <button class="fo-view-btn" id="btnMindmapView">Tree</button>
+          </div>
+          <button class="fo-expand-btn" id="btnHomeTree" title="Reset to root" aria-label="Home">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polyline points="1,7 7,1 13,7"/><polyline points="3,7 3,13 11,13 11,7"/>
+            </svg>
+          </button>
+          <button class="fo-expand-btn" id="btnExpandTree" title="Expand to full screen" aria-label="Expand">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polyline points="9,1 13,1 13,5"/><polyline points="5,13 1,13 1,9"/>
+              <line x1="13" y1="1" x2="8" y2="6"/><line x1="1" y1="13" x2="6" y2="8"/>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="fo-kpi-card">
-        <div class="fo-kpi-value" id="kpiGroupsVal">—</div>
-        <div class="fo-kpi-label" id="kpiGroupsLabel">Groups</div>
+      <div id="treeViewContainer">
+        <div class="chart-container" id="treeChart" aria-label="Group hierarchy treemap"></div>
       </div>
-      <div class="fo-kpi-card">
-        <div class="fo-kpi-value" id="kpiUsersVal">—</div>
-        <div class="fo-kpi-label" id="kpiUsersLabel">Users</div>
+      <div id="mindmapViewContainer" hidden>
+        <div id="mindmapChart" aria-label="Group hierarchy tree"></div>
       </div>
     </section>
 
-    <!-- ===== Main Grid: Treemap + Donut ===== -->
-    <div class="fo-main-grid">
-      <!-- Group Treemap -->
-      <section class="fo-panel fo-panel--tree" aria-label="Group tree">
-        <div class="fo-panel-title" id="treePanelTitle">Group Hierarchy</div>
-        <div class="chart-container" id="treeChart" aria-label="Group treemap chart"></div>
-      </section>
-
-      <!-- Vehicle Status Donut -->
-      <section class="fo-panel fo-panel--donut" aria-label="Vehicle status">
-        <div class="fo-panel-title" id="donutPanelTitle">Vehicle Status</div>
-        <div class="chart-container" id="donutChart" aria-label="Vehicle status donut chart"></div>
-      </section>
-    </div>
-
-    <!-- ===== Admin Panel (hidden for non-admins) ===== -->
-    <section id="adminPanel" hidden aria-label="Admin tools">
-      <h2 id="adminPanelTitle">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
-        </svg>
-        Admin Tools
-      </h2>
-
-      <div class="admin-grid">
-
-        <!-- Create Group -->
-        <div class="admin-sub">
-          <h3 id="adminCreateTitle">Create Group</h3>
-          <label class="fo-label" for="newGroupName" id="adminGroupNameLabel">Group Name</label>
-          <input class="fo-input" id="newGroupName" type="text" placeholder="New group name">
-          <label class="fo-label" for="parentGroupSelect" id="adminParentLabel">Parent Group</label>
-          <select class="fo-select" id="parentGroupSelect">
-            <option value="">— Root —</option>
-          </select>
-          <button class="fo-btn fo-btn--primary" id="createGroupBtn" type="button">Create Group</button>
-          <div class="op-status" id="createGroupStatus" aria-live="polite"></div>
+    <!-- Devices Panel -->
+    <section class="fo-panel fo-panel--vehicle-ops" aria-label="Group vehicles">
+      <div class="fo-vehicle-ops-header">
+        <div class="fo-vehicle-ops-header-left">
+          <span class="fo-panel-title-text" id="vehiclePanelTitle">All Vehicles</span>
+          <span class="fo-vehicle-count" id="vehicleCountBadge"></span>
+          <input class="fo-input fo-input--sm" id="vehicleSearchInput" type="search" placeholder="Search: name=Ford AND plan=Pro…">
+          <label class="fo-checkbox-label">
+            <input type="checkbox" id="showArchivedDevicesChk">
+            <span id="showArchivedDevicesLabel">Show archived devices</span>
+          </label>
+          <label class="fo-checkbox-label">
+            <input type="checkbox" id="showRelativeDatesChk" checked>
+            <span>Relative dates</span>
+          </label>
         </div>
+        <button class="fo-btn fo-btn--ghost fo-btn--sm" id="btnDownloadCsv" type="button" title="Download as CSV">↓ CSV</button>
+        <button class="fo-btn fo-btn--ghost fo-btn--sm" id="btnColumnConfig" type="button" title="Configure columns">⚙ Columns</button>
+        <button class="fo-btn fo-btn--ghost fo-btn--sm" id="btnEditMode" type="button">Edit</button>
+      </div>
+      <div class="fo-vehicle-ops-body">
+        <!-- Vehicle table -->
+        <div class="fo-vehicle-col">
+          <div class="vehicle-checklist" id="groupVehicleTable"></div>
+        </div>
+        <!-- Edit sidebar (hidden until Edit mode active) -->
+        <aside class="fo-ops-col" id="editPanel" hidden>
 
-        <!-- Bulk Assign Vehicles -->
-        <div class="admin-sub">
-          <h3 id="adminAssignTitle">Bulk Assign Vehicles</h3>
-          <label class="fo-label" for="assignTargetGroup" id="adminTargetGroupLabel">Target Group</label>
-          <select class="fo-select" id="assignTargetGroup">
-            <option value="">— Select group —</option>
-          </select>
-          <div class="admin-form-row" style="margin-top:4px">
-            <input class="fo-input" id="vehicleSearchInput" type="search" placeholder="Filter vehicles…" style="flex:1">
-            <button class="fo-btn fo-btn--secondary fo-btn--sm" id="selectAllVehiclesBtn" type="button">Select All</button>
+          <!-- Parent Group search / autocomplete -->
+          <div class="edit-section">
+            <label class="fo-label">Parent Group</label>
+            <div class="fo-autocomplete-wrap">
+              <input class="fo-input fo-input--sm" type="text" id="editGroupSearch" placeholder="Search groups…" autocomplete="off">
+              <ul class="fo-autocomplete-list" id="editGroupList"></ul>
+            </div>
           </div>
-          <div class="vehicle-checklist" id="vehicleChecklist" aria-label="Vehicle list"></div>
-          <button class="fo-btn fo-btn--primary" id="assignVehiclesBtn" type="button">Assign Selected</button>
-          <div class="op-status" id="bulkAssignStatus" aria-live="polite"></div>
-        </div>
 
-        <!-- Remove Vehicles from Group -->
-        <div class="admin-sub">
-          <h3 id="adminRemoveTitle">Remove from Group</h3>
-          <label class="fo-label" for="removeSourceGroup" id="adminSourceGroupLabel">Source Group</label>
-          <select class="fo-select" id="removeSourceGroup">
-            <option value="">— Select group —</option>
-          </select>
-          <button class="fo-btn fo-btn--secondary" id="loadGroupVehiclesBtn" type="button">Load Vehicles</button>
-          <div class="vehicle-checklist" id="removeVehicleChecklist" aria-label="Vehicles in group"></div>
-          <button class="fo-btn fo-btn--danger" id="removeVehiclesBtn" type="button">Remove Selected</button>
-          <div class="op-status" id="removeVehiclesStatus" aria-live="polite"></div>
-        </div>
+          <!-- Add operation -->
+          <div class="edit-section">
+            <label class="fo-label">Add checked devices to group</label>
+            <button class="fo-btn fo-btn--primary fo-btn--sm" id="editStageAddBtn" type="button">Add to Group</button>
+            <div class="op-status" id="editAddStatus" aria-live="polite"></div>
+          </div>
 
+          <!-- Create group operation -->
+          <div class="edit-section">
+            <label class="fo-label" for="editNewGroupName">Create group under parent</label>
+            <input class="fo-input fo-input--sm" id="editNewGroupName" type="text" placeholder="New group name">
+            <button class="fo-btn fo-btn--secondary fo-btn--sm" id="editStageCreateBtn" type="button">Stage Create</button>
+            <div class="op-status" id="editCreateStatus" aria-live="polite"></div>
+          </div>
+
+          <!-- Remove hint -->
+          <p class="fo-hint">Click group badges on device rows to stage removals.</p>
+
+          <!-- Staged changes summary -->
+          <div class="edit-staged" id="editStagedPanel" hidden>
+            <div class="edit-staged-header">
+              <span>Staged changes</span>
+              <button class="fo-btn fo-btn--danger fo-btn--sm" id="editClearAllBtn" type="button">Clear &amp; Exit</button>
+            </div>
+            <div id="editStagedList" class="edit-pending-list"></div>
+          </div>
+
+        </aside>
       </div>
     </section>
 
   </div><!-- /.fo-container -->
 
-  <!-- ===== Loading Overlay ===== -->
+  <!-- Loading Overlay -->
   <div id="loadingOverlay" hidden aria-live="polite" aria-label="Loading">
     <div class="fo-spinner"></div>
     <div id="loadingText">Loading…</div>
     <div id="loadingSteps" class="loading-steps"></div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" hidden>
+    <div class="confirm-backdrop">
+      <div class="confirm-dialog">
+        <div class="confirm-header">
+          <h3>Confirm Changes</h3>
+          <button class="col-config-close" id="confirmClose" type="button">✕</button>
+        </div>
+        <div class="confirm-body" id="confirmSummary"></div>
+        <div class="confirm-footer">
+          <button class="fo-btn fo-btn--ghost fo-btn--sm" id="confirmCancel" type="button">Cancel</button>
+          <button class="fo-btn fo-btn--primary" id="confirmApply" type="button">Apply Changes</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
